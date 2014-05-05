@@ -11,6 +11,7 @@
 #define NUM_VERTICES_PER_HEX 2
 #define NUM_RETRAINS_PER_HEX 2
 #define NUM_DISCIPLINES 6
+#define OUTSIDE_BOARD
 
 
 // Represents a single coordinate within the 2d grid.
@@ -23,6 +24,18 @@ typedef struct _coord {
     int arcNum;
     int vertNum;
 } coord;
+
+
+// functions to convert between the regionID and our coordinate system
+static coord regIDToCoord(int regID);
+static int coordToRegID(coord inCoord);
+
+// functions to return which arc (or vertex) is at the end of a path
+static coord pathToARC(path inPath);
+static coord pathToVertex(path inPath);
+
+// function which traverses the path to make sure it is contained 
+static int isPathContained(path inPath);
 
 
 // used throughout the implementation, stores a particular location in
@@ -90,3 +103,70 @@ typedef struct _game {
     int uniWithMostPubs;
     int uniWithMostPubs_number;
 } game;
+
+
+// return the coordinate of a hex given its region ID
+static coord regIDToCoord(int regID) {
+    coord newCoord;
+    if (regID < 3) {
+        newCoord.x = 1;
+        newCoord.y = 5-regID;
+    } else if (regID < 7) {
+        newCoord.x = 2;
+        newCoord.y = 5-regID+3;
+    } else if (regID < 12) {
+        newCoord.x = 3;
+        newCoord.y = 5-regID+7;
+    } else if (regID < 16) {
+        newCoord.x = 4;
+        newCoord.y = 5-regID+11;
+    } else {
+        newCoord.x = 5;
+        newCoord.y = 5-regID+14;
+    }
+
+    return newCoord;
+}
+
+
+// return the region ID of a particular coordinate (-1 if outside board)
+static int coordToRegID(coord inCoord) {
+    int newRegID;
+    if (inCoord.x < 1) {
+        newRegID = OUTSIDE_BOARD;
+    } else if (inCoord.x < 2) {
+        if (inCoord.y < 3) {
+            newRegID = OUTSIDE_BOARD;
+        } else {
+            newRegID = 5 - inCoord.y;
+        }
+    } else if (inCoord.x < 3) {
+        if (inCoord.y < 2) {
+            newRegID = OUTSIDE_BOARD;
+        } else {
+            newRegID = 8 - inCoord.y;
+        }
+    } else if (inCoord.x < 4) {
+        if (inCoord.y < 1) {
+            newRegID = OUTSIDE_BOARD;
+        } else {
+            newRegID = 12 - inCoord.y;
+        }
+    } else if (inCoord.x < 5) {
+        if (inCoord.y < 1 || inCoord.y > 4) {
+            newRegID = OUTSIDE_BOARD;
+        } else {
+            newRegID = 16 - inCoord.y;
+        }
+    } else if (inCoord.x < 6) {
+        if (inCoord.y < 1 || inCoord.y > 3) {
+            newRegID = OUTSIDE_BOARD;
+        } else {
+            newRegID = 19 - inCoord.y;
+        }
+    } else {
+        newRegID = OUTSIDE_BOARD;
+    }
+
+    return newRegID;
+}
