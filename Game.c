@@ -11,7 +11,7 @@
 #define NUM_VERTICES_PER_HEX 2
 #define NUM_RETRAINS_PER_HEX 2
 #define NUM_DISCIPLINES 6
-#define OUTSIDE_BOARD
+#define OUTSIDE_BOARD -1
 
 
 // Represents a single coordinate within the 2d grid.
