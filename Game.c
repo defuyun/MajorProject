@@ -1,8 +1,21 @@
+/*
+ * Game.c - data organisation system for the
+ * Geographic Model of Disciplines Simulation
+ * 
+ * By Timothy Chin, James Houlahan, Matthew Siesco and Tianqi Liu
+ * 
+ * This file contains the handlers for the game simulation.
+ * The interaction and frontend exists in runGame.c
+ * This file only contains functions for use with manipulating
+ * data stored in the game type.
+ */
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include "Game.h"
+#include "Game.h" // See Game.h for all shared functions and structs
 
 
 #define GRID_WIDTH 7
@@ -14,6 +27,10 @@
 #define OUTSIDE_BOARD -1
 
 
+// =====================================================================
+//    TYPEDEFS/STRUCTS BEGIN
+// =====================================================================
+
 // Represents a single coordinate within the 2d grid.
 // Simplifies the process of referring to a particular arc/vertex within
 // the grid, since we can give the exact x/y coordinates plus which 
@@ -24,19 +41,6 @@ typedef struct _coord {
     int arcNum;
     int vertNum;
 } coord;
-
-
-// functions to convert between the regionID and our coordinate system
-static coord regIDToCoord(int regID);
-static int coordToRegID(coord inCoord);
-
-// functions to return which arc (or vertex) is at the end of a path
-static coord pathToARC(path inPath);
-static coord pathToVertex(path inPath);
-
-// function which traverses the path to make sure it is contained 
-static int isPathContained(path inPath);
-
 
 // used throughout the implementation, stores a particular location in
 // the 2d array. To access an element in the board specified as 
@@ -61,7 +65,7 @@ typedef struct _hex {
 } hex;
 
 
-// a struct that represents the board
+// a struct that represents the board, gamedata and uni data
 typedef struct _game {
     // a 7 wide by 6 high grid of the board, each element is type hex
     // grid[x][y]
@@ -103,6 +107,30 @@ typedef struct _game {
     int uniWithMostPubs;
     int uniWithMostPubs_number;
 } game;
+
+
+
+// =====================================================================
+//   TYPEDEFS/STRUCTS END
+//   STATIC FUNCTION DECLARATIONS BEGIN
+// =====================================================================
+
+// Note: All functions that are here should be STATIC. We don't want
+// anyone using our internal functions and messing with our stuff
+// and we have to stick to the interface anyway.
+
+// functions to convert between the regionID and our coordinate system
+static coord regIDToCoord(int regID);
+static int coordToRegID(coord inCoord);
+
+// functions to return which arc (or vertex) is at the end of a path
+static coord pathToARC(path inPath);
+static coord pathToVertex(path inPath);
+
+// function which traverses the path to make sure it is contained 
+static int isPathContained(path inPath);
+
+
 
 
 // return the coordinate of a hex given its region ID
