@@ -1,5 +1,5 @@
 MajorProject
 ============
 
-Welcome to Tim's branch.
-Handling optimisations of components here
+This is the master branch. Only WORKING STABLE code should be here
+i.e. code that passes all the tests in testGame.c
