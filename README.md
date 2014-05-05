@@ -1,5 +1,5 @@
 MajorProject
 ============
-Major project and stuff... yeah
 
-Don't copy!
+Welcome to Tim's branch.
+Handling optimisations of components here
