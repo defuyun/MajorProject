@@ -114,6 +114,7 @@ typedef struct _game {
     int uniWithMostPubs_number;
 } game;
 
+
 // =====================================================================
 //   TYPEDEFS/STRUCTS END
 //   STATIC FUNCTION DECLARATIONS BEGIN
@@ -131,23 +132,24 @@ static int coordToRegID(coord inCoord);
 static coord pathToARC(path inPath);
 static coord pathToVertex(path inPath);
 
-// static void translatePath(char *pathStr);
-// function to translate path string into readable numbers for
-// pathToARC and pathToVertex?
-
-// function which traverses the path to make sure it is contained
-// Elaborate on this?
+// function which steps through the path, beginning at the default
+// starting point on the board, and if the path leaves the board at any 
+// time, returns FALSE. If the path remains contained within the board
+// it returns TRUE. "RRRRRR" is not contained, whereas "LRRRRR" is.
 static int isPathContained(path inPath);
 
-// function to check that there exists a path between an existing
-// campus/arc and the new campus/arc
-static int isPathConnected(path inPath,int player);
+// when building a new campus, call "isCampusConnected" on the 
+// destination vertex to ensure there are arcs adjacent. When building 
+// an ARC, call isARCConnected on the destination edge to ensure an
+// ARC or campus is adjacent
+static int isARCConnected(path inPath,int player);
+static int isCampusConnected(path inPath,int player);
+
 
 // =====================================================================
 //   STATIC FUNCTION DECLARATIONS END
 //   STATIC FUNCTIONS BEGIN
 // =====================================================================
-
 
 // Return the coordinate of a hex given its region ID
 static coord regIDToCoord(int regID) {
@@ -216,11 +218,78 @@ static int coordToRegID(coord inCoord) {
     return newRegID;
 }
 
-static coord pathToARC(path inPath);
 
+// Move an imaginary point along the path. If at any time the point 
+// exits the game board, it means the path ISN'T contained. If the 
+// point remains within the board for the duration of the path, then
+// the path IS contained.
+static int isPathContained(path inPath) {
+    // there are six directions we could be facing, call them 0..5
+    // turning RIGHT adds 1 mod 6
+    // turning LEFT subtracts 1 mod 6
+    // turning BACK adds 3 mod 6
+    // DOWN-RIGHT: 0    DOWN-LEFT: 1
+    // LEFT: 2          UP-LEFT: 3
+    // UP-RIGHT: 4      RIGHT: 5
 
+    // suppose we are outside the board, about to step onto the board
+    coord currentCoord = {.x = 2, .y = 6};
+    int currentDirection = 0;
+    int isContained = TRUE;
 
+    // traverse the whole path as long as we remain inside the board
+    while (inPath[i] != 0 && isContained == TRUE) {
+        // read the direction to turn, assert it is a valid direction
+        char turn = inPath[i];
+        assert(turn == 'R' || turn == 'L' || turn == 'B');
 
+        // newDirection is the direction [0..5] we face after the turn
+        int newDirection;
+        if (turn == 'L') {
+            newDirection = (currentDirection - 1 + 6) % 6;
+        } else if (turn == 'R') {
+            newDirection = (currentDirection + 1) % 6;
+        } else {
+            newDirection = (currentDirection + 3) % 6;
+        }
+
+        // depending on the turn, adjust the current coordinate
+        if (newDirection == 1 && currentDirection == 0) {
+            currentCoord.x++;
+            currentCoord.y--;
+        } else if (newDirection == 2 && currentDirection == 1) {
+            currentCoord.x--;
+        } else if (newDirection == 3 && currentDirection == 2) {
+            currentCoord.x--;
+            currentCoord.y++;
+        } else if (newDirection == 4 && currentDirection == 3) {
+            currentCoord.x++;
+        } else if (newDirection == 5 && currentDirection == 0) {
+            currentCoord.x++;
+            currentCoord.y--;
+        } else if (newDirection == 4 && currentDirection == 5) {
+            currentCoord.x++;
+        } else if (newDirection == 3 && currentDirection == 4) {
+            currentCoord.x--;
+            currentCoord.y++;
+        } else if (newDirection == 0 && currentDirection == 1) {
+            currentCoord.x--;
+        } 
+
+        // coordToRegID returns -1 if outside board so we can use that 
+        // to our advantage to check if the coordinate we ended up at
+        // is inside the board or not
+        if (coordToRegID(currentCoord) == -1) {
+            isContained == FALSE;
+        }
+
+        // update the direction we face
+        currentDirection = newDirection;
+        i++;
+    }
+
+    return isContained;
+}
 
 
 // =====================================================================
