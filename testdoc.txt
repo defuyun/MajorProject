@@ -1,0 +1,6 @@
+This file only exists to facilitate familiarising oneself with git and
+github. Anyone can add or remove anything from this file, so don't
+use it to keep notes or anything
+
+qwertyuiopasdfghjklzxcvbnm
+QWERTYUIOPASDFGHJKLZXCVBNM
