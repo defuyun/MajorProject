@@ -114,9 +114,6 @@ typedef struct _game {
     int uniWithMostPubs_number;
 } game;
 
-
-
-
 // =====================================================================
 //   TYPEDEFS/STRUCTS END
 //   STATIC FUNCTION DECLARATIONS BEGIN
@@ -134,8 +131,22 @@ static int coordToRegID(coord inCoord);
 static coord pathToARC(path inPath);
 static coord pathToVertex(path inPath);
 
-// function which traverses the path to make sure it is contained 
+// static void translatePath(char *pathStr);
+// function to translate path string into readable numbers for
+// pathToARC and pathToVertex?
+
+// function which traverses the path to make sure it is contained
+// Elaborate on this?
 static int isPathContained(path inPath);
+
+// function to check that there exists a path between an existing
+// campus/arc and the new campus/arc
+static int isPathConnected(path inPath,int player);
+
+// =====================================================================
+//   STATIC FUNCTION DECLARATIONS END
+//   STATIC FUNCTIONS BEGIN
+// =====================================================================
 
 
 // Return the coordinate of a hex given its region ID
@@ -205,12 +216,16 @@ static int coordToRegID(coord inCoord) {
     return newRegID;
 }
 
+static coord pathToARC(path inPath);
+
+
+
 
 
 
 // =====================================================================
-//   STATIC FUNCTION DECLARATIONS END
-//   API FUNCTION DECLARATIONS BEGIN
+//   STATIC FUNCTIONS END
+//   API FUNCTIONS BEGIN
 // =====================================================================
 
 // create a new game struct on the heap, set up its initial values such
