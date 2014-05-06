@@ -7,7 +7,8 @@
  * This file contains the handlers for the game simulation.
  * The interaction and frontend exists in runGame.c
  * This file only contains functions for use with manipulating
- * data stored in the game type.
+ * data stored in the game type. It provides the implementation of the
+ * API given in Game.h.
  */
 
 
@@ -15,7 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include "Game.h" // See Game.h for all shared functions and structs
+#include "Game.h" // See Game.h for all API functions and structs
 
 
 #define GRID_WIDTH 7
@@ -31,7 +32,7 @@
 //    TYPEDEFS/STRUCTS BEGIN
 // =====================================================================
 
-// Represents a single coordinate within the 2d grid.
+// Represents a single coordinate within the 2d grid in our game struct.
 // Simplifies the process of referring to a particular arc/vertex within
 // the grid, since we can give the exact x/y coordinates plus which 
 // arc/vertex in the hex we require
@@ -42,7 +43,8 @@ typedef struct _coord {
     int vertNum;
 } coord;
 
-// used throughout the implementation, stores a particular location in
+
+// Used throughout the implementation, stores a particular location in
 // the 2d array. To access an element in the board specified as 
 // a coordinate, use game.grid[coord.x][coord.y] and select the 
 // appropriate arc or vertex by coord.arcNum or coord.vertNum
@@ -65,13 +67,17 @@ typedef struct _hex {
 } hex;
 
 
-// a struct that represents the board, gamedata and uni data
+// This is the struct representing a given game state. It is passed
+// throughout all the functions within the API. Avoid accessing
+// the contents of this game struct directly -- if a function exists
+// to retrieve what you are trying to retrieve, use it, don't access the
+// struct unnecessarily
 typedef struct _game {
     // a 7 wide by 6 high grid of the board, each element is type hex
     // grid[x][y]
     hex grid[GRID_WIDTH][GRID_HEIGHT];
 
-    // what turn we are currently on
+    // what turn we are on
     int turnNumber;
 
     // the number of each resource type each uni has [A, B, C]
@@ -99,14 +105,15 @@ typedef struct _game {
     // the number of publications each uni has [A, B, C]
     int numPubs[NUM_UNIS];
 
-    // holds which uni currently has the most arcs
+    // holds which uni has the most arcs and how many they have
     int uniWithMostARCs;
     int uniWithMostARCs_number;
 
-    // holds which uni currently has the most publications
+    // holds which uni has the most publications and how many they have
     int uniWithMostPubs;
     int uniWithMostPubs_number;
 } game;
+
 
 
 
@@ -131,9 +138,7 @@ static coord pathToVertex(path inPath);
 static int isPathContained(path inPath);
 
 
-
-
-// return the coordinate of a hex given its region ID
+// Return the coordinate of a hex given its region ID
 static coord regIDToCoord(int regID) {
     coord newCoord;
     if (regID < 3) {
@@ -157,7 +162,8 @@ static coord regIDToCoord(int regID) {
 }
 
 
-// return the region ID of a particular coordinate (-1 if outside board)
+// return the region ID of a hex given it's coordinate, or -1 if 
+// outside the board
 static int coordToRegID(coord inCoord) {
     int newRegID;
     if (inCoord.x < 1) {
@@ -198,3 +204,199 @@ static int coordToRegID(coord inCoord) {
 
     return newRegID;
 }
+
+
+
+
+// =====================================================================
+//   STATIC FUNCTION DECLARATIONS END
+//   API FUNCTION DECLARATIONS BEGIN
+// =====================================================================
+
+// create a new game struct on the heap, set up its initial values such
+// as the hex types as given by the discipline[] and dice[] arrays, and
+// return a Game variable holding a pointer to it
+Game newGame (int discipline[], int dice[]) {
+    Game g;
+    return g;
+}
+
+
+// free all the memory malloced for the game
+void disposeGame (Game g) {
+    free(g);
+}
+
+
+// make the specified action for the current player and update the 
+// game state accordingly.  
+// The function may assume that the action requested is legal.
+// START_SPINOFF is not a legal action here
+void makeAction (Game g, action a) {
+    // perform the requested action `a'
+    // update counters as required (e.g. uniWithMostPubs, numIPs, 
+    // numKPI, studentAmounts etc)
+}
+
+
+// advance the game to the next turn, 
+// assuming that the dice has just been rolled and produced diceScore
+// the game starts in turn -1 (we call this state "Terra Nullis") and 
+// moves to turn 0 as soon as the first dice is thrown. 
+void throwDice (Game g, int diceScore) {
+    // advance the turn and distribute resources
+}
+
+
+// what type of students are produced by the specified region?
+// regionID is the index of the region in the newGame arrays (above) 
+// see discipline codes above
+int getDiscipline (Game g, int regionID) {
+    coord c = regIDToCoord(regionID);
+    return g->grid[c.x][c.y].resType;
+}
+
+
+// what dice value produces students in the specified region?
+// 2..12
+int getDiceValue (Game g, int regionID) {
+    coord c = regIDToCoord(regionID);
+    return g->grid[c.x][c.y].diceNum;
+}
+
+
+// which university has the prestige award for the most ARCs?
+// this is NO_ONE until the first arc is purchased after the game 
+// has started.  
+int getMostARCs (Game g) {
+    return g->uniWithMostARCs;
+}
+
+
+// which university has the prestige award for the most pubs?
+// this is NO_ONE until the first publication is made.
+int getMostPublications (Game g) {
+    return g->uniWithMostPubs;
+}
+
+
+// return the current turn number of the game -1,0,1, ..
+int getTurnNumber (Game g) {
+    return g->turnNumber;
+}
+
+
+// return the player id of the player whose turn it is 
+// the result of this function is NO_ONE during Terra Nullis
+int getWhoseTurn (Game g) {
+    int p;
+    if (getTurnNumber(g) == -1) {
+        p = NO_ONE;
+    } else {
+        p = getTurnNumber(g) % 3 + 1;
+    }
+    return p;
+}
+
+
+// return the contents of the given vertex (ie campus code or 
+// VACANT_VERTEX)
+int getCampus(Game g, path pathToVertex) {
+    // return what exists on the given vertex
+    int vertex;
+    return vertex;
+}
+
+
+// return the contents of the given edge (ie ARC code or vacant ARC)
+int getARC(Game g, path pathToEdge) {
+    // return what exists on the given ARC
+    int arc;
+    return arc;
+}
+
+
+// returns TRUE if it is legal for the current player to make the 
+// specified action, FALSE otherwise.
+// It is not legal for a player to make the moves OBTAIN_PUBLICATION 
+// or OBTAIN_IP_PATENT (they can make the move START_SPINOFF)
+// you can assume that any paths passed in are NULL terminated strings.
+int isLegalAction (Game g, action a) {
+    // assume the action is legal, then go through a series of tests,
+    // changing it to FALSE if it fails a test.
+    int isLegal = TRUE;
+
+    // example: players cannot outright ask to obtain ip/publication
+    if (a.actionCode == OBTAIN_PUBLICATION 
+            || a.actionCode == OBTAIN_IP_PATENT) {
+        isLegal = FALSE;
+    }
+    return isLegal;
+}
+
+
+// return the number of KPI points the specified player has
+int getKPIpoints (Game g, int player) {
+    // player-1 so that we can use the player number 1..3 as index 0..2
+    return g->numKPI[player-1];
+}
+
+
+// return the number of ARC grants the specified player has
+int getARCs (Game g, int player) {
+    // player-1 so that we can use the player number 1..3 as index 0..2
+    return g->numARCs[player-1];
+}
+
+
+// return the number of GO8 campuses the specified player has
+int getGO8s (Game g, int player) {
+    // player-1 so that we can use the player number 1..3 as index 0..2
+    return g->numGO8s[player-1];
+}
+
+
+// return the number of normal Campuses the specified player has
+int getCampuses (Game g, int player) {
+    // player-1 so that we can use the player number 1..3 as index 0..2
+    return g->numCampuses[player-1];
+}
+
+
+// return the number of IP Patents the specified player has
+int getIPs (Game g, int player) {
+    // player-1 so that we can use the player number 1..3 as index 0..2
+    return g->numIPs[player-1];
+}
+
+
+// return the number of Publications the specified player has
+int getPublications (Game g, int player) {
+    // player-1 so that we can use the player number 1..3 as index 0..2
+    return g->numPubs[player-1];
+}
+
+
+// return the number of students of the specified discipline type 
+// the specified player has
+int getStudents (Game g, int player, int discipline) {
+    // player-1 so that we can use the player number 1..3 as index 0..2
+    // use the discipline 0..5 as the index
+    return g->studentAmounts[player-1][discipline];
+}
+
+
+// return how many students of discipline type disciplineFrom
+// the specified player would need to retrain in order to get one 
+// student of discipline type disciplineTo.  This will depend 
+// on what retraining centers, if any, they have a campus at.
+int getExchangeRate (Game g, int player, 
+                     int disciplineFrom, int disciplineTo) {
+    // assume exchange rate is 3, search through entire g-grid[x][y] 
+    // and if you find a retraining center of the correct type with a 
+    // campus owned by player at it, change it to 2
+    int e = 3;
+    // *** do search ***
+    return e;
+}
+
