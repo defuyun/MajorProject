@@ -39,6 +39,10 @@
 typedef struct _coord {
     int x;
     int y;
+
+    // a coordinate should either represent an edge or a vertex, not
+    // both, so set the unused one to -1. E.g. an arc should have -1
+    // for its "vertNum"
     int arcNum;
     int vertNum;
 } coord;
