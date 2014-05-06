@@ -132,11 +132,6 @@ static int coordToRegID(coord inCoord);
 static coord pathToARC(path inPath);
 static coord pathToVertex(path inPath);
 
-// static void translatePath(char *pathStr);
-// function to translate path string into readable numbers for
-// pathToARC and pathToVertex?
-// REPLY: not necessary, pathToARC/Vertex can react to chars 'R' and 'L'
-
 // function which steps through the path, beginning at the default
 // starting point on the board, and if the path leaves the board at any 
 // time, returns FALSE. If the path remains contained within the board
