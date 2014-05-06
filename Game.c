@@ -114,6 +114,7 @@ typedef struct _game {
     int uniWithMostPubs_number;
 } game;
 
+
 // =====================================================================
 //   TYPEDEFS/STRUCTS END
 //   STATIC FUNCTION DECLARATIONS BEGIN
@@ -134,20 +135,26 @@ static coord pathToVertex(path inPath);
 // static void translatePath(char *pathStr);
 // function to translate path string into readable numbers for
 // pathToARC and pathToVertex?
+// REPLY: not necessary, pathToARC/Vertex can react to chars 'R' and 'L'
 
-// function which traverses the path to make sure it is contained
-// Elaborate on this?
+// function which steps through the path, beginning at the default
+// starting point on the board, and if the path leaves the board at any 
+// time, returns FALSE. If the path remains contained within the board
+// it returns TRUE. "RRRRRR" is not contained, whereas "LRRRRR" is.
 static int isPathContained(path inPath);
 
-// function to check that there exists a path between an existing
-// campus/arc and the new campus/arc
-static int isPathConnected(path inPath,int player);
+// when building a new campus, call "isCampusConnected" on the 
+// destination vertex to ensure there are arcs adjacent. When building 
+// an ARC, call isARCConnected on the destination edge to ensure an
+// ARC or campus is adjacent
+static int isARCConnected(path inPath,int player);
+static int isCampusConnected(path inPath,int player);
+
 
 // =====================================================================
 //   STATIC FUNCTION DECLARATIONS END
 //   STATIC FUNCTIONS BEGIN
 // =====================================================================
-
 
 // Return the coordinate of a hex given its region ID
 static coord regIDToCoord(int regID) {
@@ -215,12 +222,6 @@ static int coordToRegID(coord inCoord) {
 
     return newRegID;
 }
-
-static coord pathToARC(path inPath);
-
-
-
-
 
 
 // =====================================================================
