@@ -726,8 +726,6 @@ void testIsLegalAction(void) {
     assert(isLegalAction(g, t_start_spinoff) == FALSE);
      
     // TEST 4: if the paths are invalid then the actions are illegal
-    action u = {.actionCode = OBTAIN_ARC, .destination="a"};
-    assert(isLegalAction(g, u) == FALSE);
     action v = {.actionCode = OBTAIN_ARC, .destination="RRR"};
     assert(isLegalAction(g, v) == FALSE);
     action w = {.actionCode = OBTAIN_ARC, .destination="RRRLLLR"};
