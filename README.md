@@ -34,4 +34,3 @@ a campus/other ARC (isARCConnected() and isCampusConnected())
         * Tim
     * isCampusConnected     **
         * Tim
-        message here
