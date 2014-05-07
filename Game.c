@@ -29,7 +29,7 @@
 
 
 // =====================================================================
-//    TYPEDEFS BEGIN
+//    TYPEDEFS/STRUCTS BEGIN
 // =====================================================================
 
 // Represents a single coordinate within the 2d grid in our game struct.
