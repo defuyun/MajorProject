@@ -11,10 +11,26 @@ path to the ARC/vertex (pathToARC() and pathToVertex())
 * Write functions to tell whether an ARC or vertex is connected to
 a campus/other ARC (isARCConnected() and isCampusConnected())
 * Finish API functions
-    * newGame()
-    * makeAction()
-    * throwDice()
-    * getCampus()
-    * getARC()
-    * isLegalAction()
-    * getExchangeRate()
+
+    * newGame()             ***
+        * James
+    * makeAction()          **
+        * Matt
+    * throwDice()           ***
+        * Tim
+    * getCampus()           *
+        * Carl
+    * getARC()              *
+        * Carl
+    * isLegalAction()       *********
+        * GROUP EFFORT
+    * getExchangeRate()     **
+        * Matt
+    * pathToARC             ***
+        * Carl
+    * pathToVertex          ***
+        * Carl
+    * isARCConnected        ***
+        * Tim
+    * isCampusConnected     **
+        * Tim
