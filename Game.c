@@ -242,6 +242,7 @@ static int isPathContained(path inPath) {
     int isContained = TRUE;
 
     // traverse the whole path as long as we remain inside the board
+    int i = 0;
     while (inPath[i] != 0 && isContained == TRUE) {
         // read the direction to turn, assert it is a valid direction
         char turn = inPath[i];
@@ -284,7 +285,7 @@ static int isPathContained(path inPath) {
         // to our advantage to check if the coordinate we ended up at
         // is inside the board or not
         if (coordToRegID(currentCoord) == -1) {
-            isContained == FALSE;
+            isContained = FALSE;
         }
 
         // update the direction we face
