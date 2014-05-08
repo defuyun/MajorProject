@@ -3,14 +3,10 @@ MajorProject
 
 Welcome to the GitHub repo for our major project.
 
+Put a strike through a function when you think you've finished it. Once 
+we confirm it is fully working, we can remove it from the list.
 List of things to do:
-* Write functions to return a coordinate of an ARC or vertex given a 
-path to the ARC/vertex (pathToARC() and pathToVertex())
-* Write functions to tell whether an ARC or vertex is connected to
-a campus/other ARC (isARCConnected() and isCampusConnected())
-* Finish API functions
-
-    * ~~newGame()~~ Done
+    * ~~newGame()~~
         * James
     * makeAction()
         * Matt

@@ -541,6 +541,7 @@ Game newGame (int discipline[], int dice[]) {
         g->numGO8s[student] = 0;
         g->numIPs[student] = 0;
         g->numPubs[student] = 0;
+        student++;
     }
 
 
