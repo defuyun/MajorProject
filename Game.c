@@ -245,8 +245,7 @@ static coord pathToVertex(path inPath){
     //e.g. direct 0 contains: right-up == left, right-down == right
     
     while (inPath[count] != '\0'){
-        switch (initialCoord.vertNum){
-        case 0: //vertex 0
+        if (!initialCoord.vertNum){ //vertex 0
             initialCoord.vertNum = 1;
             if (direct == 0){
                 initialCoord.x -= 1;
@@ -283,8 +282,8 @@ static coord pathToVertex(path inPath){
                     direct = 1;
                 }
             }
-            count++;break;
-        case 1: //vertex 1
+            count++;
+        }else if(initialCoord.vertNum == 1){ //vertex 1
             initialCoord.vertNum = 0;
             if (direct == 0){
                 initialCoord.x += 1;
@@ -320,8 +319,7 @@ static coord pathToVertex(path inPath){
                     direct = 1;
                 }
             }
-            count++;break;
-        default:break;
+            count++;
         }
     }
     return initialCoord;
@@ -336,11 +334,9 @@ static coord pathToARC(path inPath){
     //didn't enter a path
 
     int direct = 2; //three directions 0,1,2 
-
-    while (inPath[count]!='\0')
-    {
-        switch (initialCoord.vertNum){
-        case 0:
+    
+    while (inPath[count]!='\0'){
+         if (!initialCoord.vertNum){
             initialCoord.vertNum = 1;
             if (direct == 0){
                 if (inPath[count] == 'L'){
@@ -393,7 +389,7 @@ static coord pathToARC(path inPath){
                 }
             }
             count++;break;
-        case 1:
+        }else if(initialCoord.vertNum == 1){
             initialCoord.vertNum = 0;
             if (direct == 0){
                 if (inPath[count] == 'L'){
@@ -433,9 +429,8 @@ static coord pathToARC(path inPath){
                     initialCoord.arcNum = 0;
                 }
             }
-            count++;break;
-        default:break;
-        }
+            count++;
+            }
     }
     initialCoord.vertNum = -1;
     return initialCoord;
