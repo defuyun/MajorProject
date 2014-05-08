@@ -388,7 +388,7 @@ static coord pathToARC(path inPath){
                     initialCoord.arcNum = 2;
                 }
             }
-            count++;break;
+            count++;
         }else if(initialCoord.vertNum == 1){
             initialCoord.vertNum = 0;
             if (direct == 0){
@@ -684,18 +684,19 @@ int getWhoseTurn (Game g) {
 
 // return the contents of the given vertex (ie campus code or 
 // VACANT_VERTEX)
-int getCampus(Game g, path pathToVertex) {
-    // return what exists on the given vertex
-    int vertex;
-    return vertex;
+//I changed (path pathTovertex) to inPath since I'm using the function pathToVertex
+int getCampus(Game g, path inPath) {
+     //get the 2d coord of the path
+     coord vertex = pathToVertex(inPath);
+     return g->grid[vertex.x][vertex.y].vertices[vertex.vertNum];
 }
 
 
 // return the contents of the given edge (ie ARC code or vacant ARC)
 int getARC(Game g, path pathToEdge) {
-    // return what exists on the given ARC
-    int arc;
-    return arc;
+    //get the 2d coord of the path
+    coord vertex = pathToARC(pathToEdge);
+    return g->grid[vertex.x][vertex.y].vertices[vertex.arcNum];
 }
 
 
