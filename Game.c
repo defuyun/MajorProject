@@ -709,11 +709,80 @@ int isLegalAction (Game g, action a) {
     // assume the action is legal, then go through a series of tests,
     // changing it to FALSE if it fails a test.
     int isLegal = TRUE;
-
+    
+    //we only need four because the maximum disciple used is 4
+    //e.g. own normal campus uses 4 kinds of disciples, others 3 or less
+    int resourceA, resourceB, resourceC,resourceD;
+    resourceA = resourceB = resourceC = resourceD = 0; //switch off unused variable error
+    
     // example: players cannot outright ask to obtain ip/publication
     if (a.actionCode == OBTAIN_PUBLICATION 
             || a.actionCode == OBTAIN_IP_PATENT) {
         isLegal = FALSE;
+    }
+    
+    if (a.actionCode == BUILD_CAMPUS){
+        resourceA = getStudents(g, getWhoseTurn(g), STUDENT_BPS);
+        resourceB = getStudents(g, getWhoseTurn(g), STUDENT_BQN);
+        resourceC = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
+        resourceD = getStudents(g, getWhoseTurn(g), STUDENT_MTV);
+        
+        //check for enough resource
+        if (resourceA<1||resourceB<1||resourceC<1||resourceD<1){
+            isLegal = FALSE;
+        }
+        //check if the vertex is vacant and there is an arc
+        if (getCampus(g,a.destination)!= VACANT_VERTEX||
+            getARC(g,a.destination)!= getWhoseTurn(g)){
+            isLegal = FALSE;
+        }
+    }
+
+    if (a.actionCode == BUILD_GO8){
+        resourceA = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
+        resourceB = getStudents(g, getWhoseTurn(g), STUDENT_MMONEY);
+        if (resourceA<2 || resourceB<3){
+            isLegal = FALSE;
+        }
+        if (getCampus(g, a.destination) != getWhoseTurn(g)){
+            isLegal = FALSE;
+        }
+    }
+    if (a.actionCode == OBTAIN_ARC){
+        resourceA = getStudents(g, getWhoseTurn(g), STUDENT_BPS);
+        resourceB = getStudents(g, getWhoseTurn(g), STUDENT_BQN);
+        if (resourceA<1 || resourceB<1){
+            isLegal = FALSE;
+        }
+        if (getARC(g,a.destination)!= VACANT_ARC){
+            isLegal = FALSE;
+        }
+        //four paths leading to ARCs surrounding the specified ARC
+        //see if these ARCs belong to the player, if none of them does, 
+        //then the player can't build an ARC
+        
+        char testPathA[PATH_LIMIT + 2];
+        strcpy(testPathA, a.destination);
+        strcat(testPathA, "L");
+
+        char testPathB[PATH_LIMIT + 2];
+        strcpy(testPathB, a.destination);
+        strcat(testPathB, "R");
+
+        char testPathC[PATH_LIMIT + 2];
+        strcpy(testPathC, a.destination);
+        strcat(testPathC, "BR");
+
+        char testPathD[PATH_LIMIT + 2];
+        strcpy(testPathD, a.destination);
+        strcat(testPathD, "BL");
+
+        if (getARC(g, testPathA) != getWhoseTurn(g) &&
+            getARC(g, testPathB) != getWhoseTurn(g) &&
+            getARC(g, testPathC) != getWhoseTurn(g) &&
+            getARC(g, testPathD) != getWhoseTurn(g)){
+            isLegal = FALSE;
+        }
     }
     return isLegal;
 }
