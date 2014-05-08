@@ -71,63 +71,73 @@ typedef struct _game {
 
 //tests used for PathToVertex and PathToArc
 int main(int argc, char *argv[]){
-    puts("testing path to vertex......");
+    puts("testing pathToVertex()......");
     coord test;
 
+    puts("test 1....");
     test = pathToVertex("L");
     assert(test.x == 3);
     assert(test.y == 5);
     assert(test.arcNum == -1);
     assert(test.vertNum == 1);
-
+    
+    puts("test 2....");
     test = pathToVertex("LB");
     assert(test.x == 3);
     assert(test.y == 5);
     assert(test.arcNum == -1);
     assert(test.vertNum == 0);
 
+    puts("test 3....");
     test = pathToVertex("LBLLRB");
     assert(test.x == 3);
     assert(test.y == 4);
     assert(test.arcNum == -1);
     assert(test.vertNum == 0);
 
+    puts("test 4....");
     test = pathToVertex("LR");
     assert(test.x == 4);
     assert(test.y == 4);
     assert(test.arcNum == -1);
     assert(test.vertNum == 0);
 
+    puts("test 5....");
     test = pathToVertex("RLR");
     assert(test.x == 2);
     assert(test.y == 4);
     assert(test.arcNum == -1);
     assert(test.vertNum == 1);
 
+    puts("test 6....");
     test = pathToVertex("RLRRLRR");
     assert(test.x == 0);
     assert(test.y == 5);
     assert(test.arcNum == -1);
     assert(test.vertNum == 1);
 
+    puts("test 7....");
     test = pathToVertex("RLRL");
     assert(test.x == 3);
     assert(test.y == 3);
     assert(test.arcNum == -1);
     assert(test.vertNum == 0);
 
+    puts("test 8....");
     test = pathToVertex("RLRLLRRL");
     assert(test.x == 4);
     assert(test.y == 1);
     assert(test.arcNum == -1);
     assert(test.vertNum == 0);
 
+    puts("test 9....");
     test = pathToVertex("RLRLLRRLLR");
     assert(test.x == 5);
     assert(test.y == 0);
     assert(test.arcNum == -1);
     assert(test.vertNum == 0);
 
+    puts("test 10....");
     //this one goes outside the board and back
     test = pathToVertex("RLRRLRRLLLL");
     assert(test.x == 0);
@@ -135,13 +145,83 @@ int main(int argc, char *argv[]){
     assert(test.arcNum == -1);
     assert(test.vertNum == 1);
 
-    //this is an invalid input
-    test = pathToVertex("AAA");
+    printf("all test passed for pathToVertex\n\n");
+
+
+    /*==============================================================================*/
+    //testing for Path to Arc starts here
+    puts("testing PathToArc()....");
+
+    puts("test 1....");
+    test = pathToARC("L");
     assert(test.x == 3);
     assert(test.y == 5);
-    assert(test.arcNum == -1);
-    assert(test.vertNum == 0);
+    assert(test.arcNum == 1);
+    assert(test.vertNum == -1);
 
-    printf("all test passed\n");
+    puts("test 2....");
+    test = pathToARC("LB");
+    assert(test.x == 3);
+    assert(test.y == 5);
+    assert(test.arcNum == 1);
+    assert(test.vertNum == -1);
+
+    puts("test 3....");
+    test = pathToARC("LBLLRB");
+    assert(test.x == 3);
+    assert(test.y == 4);
+    assert(test.arcNum == 0);
+    assert(test.vertNum == -1);
+
+    puts("test 4....");
+    test = pathToARC("LR");
+    assert(test.x == 3);
+    assert(test.y == 5);
+    assert(test.arcNum == 2);
+    assert(test.vertNum == -1);
+
+    puts("test 5....");
+    test = pathToARC("RLR");
+    assert(test.x == 3);
+    assert(test.y == 4);
+    assert(test.arcNum == 0);
+    assert(test.vertNum == -1);
+
+    puts("test 6....");
+    test = pathToARC("RLRRLRR");
+    assert(test.x == 0);
+    assert(test.y == 5);
+    assert(test.arcNum == 2);
+    assert(test.vertNum == -1);
+
+    puts("test 7....");
+    test = pathToARC("RLRL");
+    assert(test.x == 2);
+    assert(test.y == 4);
+    assert(test.arcNum == 2);
+    assert(test.vertNum == -1);
+
+    puts("test 8....");
+    test = pathToARC("RLRLLRRL");
+    assert(test.x == 3);
+    assert(test.y == 2);
+    assert(test.arcNum == 2);
+    assert(test.vertNum == -1);
+
+    puts("test 9....");
+    test = pathToARC("RLRLLRRLLR");
+    assert(test.x == 4);
+    assert(test.y == 1);
+    assert(test.arcNum == 2);
+    assert(test.vertNum == -1);
+
+    puts("test 10....");
+    //this one goes outside the board and back
+    test = pathToARC("RLRRLRRLLLLL");
+    assert(test.x == 1);
+    assert(test.y == 4);
+    assert(test.arcNum == 0);
+    assert(test.vertNum == -1);
+
+    printf("all test passed for pathToArc\n");
 }
-
