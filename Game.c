@@ -524,7 +524,87 @@ static int isPathContained(path inPath) {
 // as the hex types as given by the discipline[] and dice[] arrays, and
 // return a Game variable holding a pointer to it
 Game newGame (int discipline[], int dice[]) {
-    Game g;
+    Game g = malloc(sizeof(game));
+
+    // turn number starts at -1
+    g->turnNumber = -1;
+
+    int student = 0;
+    while (student < NUM_UNIS) {
+        // create the initial student numbers
+        g->studentAmounts[student][STUDENT_THD] = 0;
+        g->studentAmounts[student][STUDENT_BPS] = 3;
+        g->studentAmounts[student][STUDENT_BQN] = 3;
+        g->studentAmounts[student][STUDENT_MTV] = 1;
+        g->studentAmounts[student][STUDENT_MJ] = 1;
+        g->studentAmounts[student][STUDENT_MMONEY] = 1;
+        
+        // create the initial stats
+        g->numKPI[student] = 20;
+        g->numARCs[student] = 0;
+        g->numCampuses[student] = 2;
+        g->numGO8s[student] = 0;
+        g->numIPs[student] = 0;
+        g->numPubs[student] = 0;
+    }
+
+
+    // each hex needs to be given the correct discipline and dice value
+    int row = 0;
+    int column = 0;
+    // create the hex layout's disciplines and dice
+    while (row < GRID_HEIGHT) {
+        while (column < GRID_WIDTH) {
+            coord currentCoord = {.x = column, .y = row};
+            int regID = coordToRegID(currentCoord);
+            if (regID != -1) {
+                g->grid[column][row].resType 
+                    = discipline[coordToRegID(currentCoord)];
+                g->grid[column][row].diceNum 
+                    = dice[coordToRegID(currentCoord)];
+                g->grid[column][row].arcs[0] = VACANT_ARC;
+                g->grid[column][row].arcs[1] = VACANT_ARC;
+                g->grid[column][row].arcs[2] = VACANT_ARC;
+                g->grid[column][row].vertices[0] = VACANT_VERTEX;
+                g->grid[column][row].vertices[1] = VACANT_VERTEX;
+            } else {
+                g->grid[column][row].resType = -1;
+                g->grid[column][row].diceNum = -1;
+            }
+            column++;
+        }
+        column = 0;
+        row++;
+    }
+
+    // holds which uni currently has the most ARCs
+    g->uniWithMostARCs = NO_ONE;
+    g->uniWithMostARCs_number = NO_ONE;
+
+    // holds which uni currently has the most publications
+    g->uniWithMostPubs = NO_ONE;
+    g->uniWithMostPubs_number = NO_ONE;
+
+    // create the campuses
+    g->grid[3][0].vertices[1] = CAMPUS_A;
+    g->grid[3][5].vertices[0] = CAMPUS_A;
+    g->grid[1][2].vertices[0] = CAMPUS_C;
+    g->grid[5][3].vertices[1] = CAMPUS_C;
+    g->grid[0][5].vertices[1] = CAMPUS_B;
+    g->grid[6][0].vertices[0] = CAMPUS_B;
+
+    // create the retrainers
+    g->grid[2][5].retrainCenters[0] = STUDENT_MTV;
+    g->grid[2][5].retrainCenters[1] = STUDENT_MTV;
+    g->grid[4][4].retrainCenters[0] = STUDENT_MMONEY;
+    g->grid[4][4].retrainCenters[1] = STUDENT_MMONEY;
+    g->grid[6][1].retrainCenters[0] = STUDENT_BQN;
+    g->grid[5][1].retrainCenters[1] = STUDENT_BQN;
+    g->grid[5][0].retrainCenters[0] = STUDENT_MJ;
+    g->grid[4][0].retrainCenters[1] = STUDENT_MJ;
+    g->grid[1][2].retrainCenters[1] = STUDENT_BPS;
+    g->grid[2][1].retrainCenters[0] = STUDENT_BPS;
+
     return g;
 }
 
