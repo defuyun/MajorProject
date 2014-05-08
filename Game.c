@@ -222,122 +222,202 @@ static int coordToRegID(coord inCoord) {
     return newRegID;
 }
 
-//returns the coordinate and specified vertex of a given path
+//returns the coordinate and the corresponding vertex of a given path
 static coord pathToVertex(path inPath){
     int count = 0; // set a counter to determine which step
-    char path = *(inPath+count);
     coord initialCoord = {.x = 3,.y = 5,.arcNum = -1,.vertNum = 0};   
-    int direct = 2; //three directions 0,1,2 
+    int direct = 2; //each vertex(0,1) can have 3 directions, each direction has 3 path(L,B,R)
     
-    while (path != '\0'){
+    while (inPath[count] != '\0'){
+        switch (initialCoord.vertNum){
+        case 0: //vertex 1 
+            initialCoord.vertNum = 1;
+            if (direct == 0){
+                initialCoord.x -= 1;
+                if (inPath[count] == 'L'){
+                    direct = 2;
+                }else if (inPath[count] == 'R'){
+                    initialCoord.y += 1;
+                    direct = 1;
+                }else if (inPath[count] == 'B'){
+                    initialCoord.x += 1;
+                    direct = 0;
+                }
+            }else if (direct == 1){
+                if (inPath[count]  == 'L'){
+                    initialCoord.x -= 1;
+                    initialCoord.y += 1;
+                    direct = 1;
+                }else if (inPath[count]  == 'R'){
+                    direct = 0;
+                }else if (inPath[count]  == 'B'){
+                    initialCoord.x -= 1;
+                    direct = 2;
+                }
+            }else if (direct == 2){
+                initialCoord.vertNum = 1;
+                if (inPath[count]  == 'L'){
+                    direct = 0;
+                }else if (inPath[count]  == 'R'){
+                    initialCoord.x -= 1;
+                    direct = 2;
+                }else if (inPath[count]  == 'B'){
+                    initialCoord.x -= 1;
+                    initialCoord.y += 1;
+                    direct = 1;
+                }
+            }
+            count++;break;
+        case 1: //vertex 2
+            initialCoord.vertNum = 0;
+            if (direct == 0){
+                initialCoord.x += 1;
+                if (inPath[count] == 'L'){
+                    direct = 1;
+                }else if (inPath[count]  == 'R'){
+                    initialCoord.y -= 1;
+                    direct = 2;
+                }else if (inPath[count]  == 'B'){
+                    initialCoord.x -= 1;
+                    direct = 0;
+                }
+            }else if (direct == 1){
+                if (inPath[count]  == 'L'){
+                    direct = 0;
+                }else if (inPath[count]  == 'R'){
+                    initialCoord.x += 1;
+                    direct = 1;
+                }else if (inPath[count]  == 'B'){
+                    initialCoord.x += 1;
+                    initialCoord.y -= 1;
+                    direct = 2;
+                }
+            }else if (direct == 2){
+                if (inPath[count] == 'L'){
+                    initialCoord.x += 1;
+                    initialCoord.y -= 1;
+                    direct = 2;
+                }else if (inPath[count] == 'R'){
+                    direct = 0;
+                }else if (inPath[count]  == 'B'){
+                    initialCoord.x += 1;
+                    direct = 1;
+                }
+            }
+            count++;break;
+        default:break;
+        }
+    }
+    return initialCoord;
+}
+
+static coord pathToARC(path inPath){
+    int count = 0;
+    coord initialCoord = { .x = 3, .y = 5, .arcNum = -1, .vertNum = 0 };
+    //vertNum set to 0 or 1 to determine which vertex currently on, doesn't matter what 
+    //coordinate
+    //arcNum set to -1 because initially there is no arc, so it returns -1 if player 
+    //didn't enter a path
+
+    int direct = 2; //three directions 0,1,2 
+
+    while (inPath[count]!='\0')
+    {
         switch (initialCoord.vertNum){
         case 0:
             initialCoord.vertNum = 1;
             if (direct == 0){
-                initialCoord.x -= 1;
-                if (path == 'L'){
+                if (inPath[count] == 'L'){
+                    initialCoord.arcNum = 0;
                     direct = 2;
-                }else if (path == 'R'){
+                  
+                }else if (inPath[count] == 'R'){
+                    initialCoord.x -= 1;
                     initialCoord.y += 1;
+                    initialCoord.arcNum = 2;
                     direct = 1;
-                }else if (path == 'B'){
-                    initialCoord.x += 1;
+                }else if (inPath[count] == 'B'){
                     direct = 0;
-                }else{
-                    initialCoord.vertNum = 0;
-                    goto horrible;
+                    initialCoord.arcNum = 1;
                 }
             }else if (direct == 1){
-                if (path == 'L'){
+                if (inPath[count] == 'L'){
                     initialCoord.x -= 1;
                     initialCoord.y += 1;
+                    initialCoord.arcNum = 2;
                     direct = 1;
-                }else if (path == 'R'){
+                }else if (inPath[count] == 'R'){
                     direct = 0;
-                }else if (path == 'B'){
-                    initialCoord.x -= 1;
+                    initialCoord.arcNum = 1;
+                }else if (inPath[count] == 'B'){
                     direct = 2;
-                }else{
-                    initialCoord.vertNum = 0;
-                    goto horrible;
+                    initialCoord.arcNum = 0;
                 }
             }else if (direct == 2){
                 initialCoord.vertNum = 1;
-                if (path == 'L'){
+                if (!(initialCoord.x == 3 && initialCoord.y == 5)){
+                    initialCoord.x += 1;
+                    initialCoord.y -= 1;
+                }if (inPath[count] == 'L'){
                     direct = 0;
-                }else if (path == 'R'){
-                    initialCoord.x -= 1;
+                    initialCoord.arcNum = 1;
+                }else if (inPath[count] == 'R'){
                     direct = 2;
-                }else if (path == 'B'){
+                    initialCoord.arcNum = 0;
+                }else if (inPath[count] == 'B'){
                     initialCoord.x -= 1;
                     initialCoord.y += 1;
                     direct = 1;
-                }else{
-                    initialCoord.vertNum = 0;
-                    goto horrible;
+                    initialCoord.arcNum = 2;
                 }
             }
-            count++;
-            path = *(inPath + count);
-            break;
+            count++;break;
         case 1:
             initialCoord.vertNum = 0;
             if (direct == 0){
-                initialCoord.x += 1;
-                if (path == 'L'){
+                if (inPath[count] == 'L'){
+                    initialCoord.x += 1;
                     direct = 1;
-                }else if (path == 'R'){
-                    initialCoord.y -= 1;
+                    initialCoord.arcNum = 0;
+                }else if (inPath[count] == 'R'){
+                    initialCoord.arcNum = 2;
                     direct = 2;
-                }else if (path == 'B'){
-                    initialCoord.x -= 1;
+                }else if (inPath[count] == 'B'){
+                    initialCoord.arcNum = 1;
                     direct = 0;
-                }else{
-                    initialCoord.vertNum = 1;
-                    goto horrible;
                 }
             }else if (direct == 1){
-                if (path == 'L'){
+                if (inPath[count] == 'L'){
                     direct = 0;
-                }else if (path == 'R'){
+                    initialCoord.arcNum = 1;
+                }else if (inPath[count] == 'R'){
                     initialCoord.x += 1;
                     direct = 1;
-                }else if (path == 'B'){
-                    initialCoord.x += 1;
-                    initialCoord.y -= 1;
+                    initialCoord.arcNum = 0;
+                }else if (inPath[count] == 'B'){
                     direct = 2;
-                }else{
-                    initialCoord.vertNum = 1;
-                    goto horrible;
+                    initialCoord.arcNum = 2;
                 }
             }else if (direct == 2){
-                if (path == 'L'){
-                    initialCoord.x += 1;
-                    initialCoord.y -= 1;
+                initialCoord.x -= 1;
+                if (inPath[count] == 'L'){
                     direct = 2;
-                }else if (path == 'R'){
+                    initialCoord.arcNum = 2;
+                }else if (inPath[count] == 'R'){
                     direct = 0;
-                }else if (path == 'B'){
+                    initialCoord.arcNum = 1;
+                }else if (inPath[count] == 'B'){
                     initialCoord.x += 1;
                     direct = 1;
-                }else{
-                    initialCoord.vertNum = 1;
-                    goto horrible;
+                    initialCoord.arcNum = 0;
                 }
             }
-            count++;
-            path = *(inPath + count);
-            break;
+            count++;break;
         default:break;
         }
     }
-    
-    if(0){
-        horrible: puts("invalid input, returning result of last valid input.\n");
-    }
-    
+    initialCoord.vertNum = -1;
     return initialCoord;
-    
 }
 
 // Move an imaginary point along the path. If at any time the point 
