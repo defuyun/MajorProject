@@ -12,17 +12,17 @@ List of things to do:
     * Matt
 * throwDice()
     * Tim
-* getCampus()
+* ~~getCampus()~~
     * Carl
-* getARC()
+* ~~getARC()~~
     * Carl
 * isLegalAction()
     * Mostly James, since he has less functions than other people
 * getExchangeRate()
     * Matt
-* pathToARC
+* ~~pathToARC~~
     * Carl
-* pathToVertex
+* ~~pathToVertex~~
     * Carl
 * isARCConnected
     * Tim
