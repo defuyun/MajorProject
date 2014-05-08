@@ -244,6 +244,7 @@ static coord pathToVertex(path inPath){
                     initialCoord.x += 1;
                     direct = 0;
                 }else{
+                    initialCoord.vertNum = 0;
                     goto horrible;
                 }
             }else if (direct == 1){
@@ -257,6 +258,7 @@ static coord pathToVertex(path inPath){
                     initialCoord.x -= 1;
                     direct = 2;
                 }else{
+                    initialCoord.vertNum = 0;
                     goto horrible;
                 }
             }else if (direct == 2){
@@ -271,6 +273,7 @@ static coord pathToVertex(path inPath){
                     initialCoord.y += 1;
                     direct = 1;
                 }else{
+                    initialCoord.vertNum = 0;
                     goto horrible;
                 }
             }
@@ -290,6 +293,7 @@ static coord pathToVertex(path inPath){
                     initialCoord.x -= 1;
                     direct = 0;
                 }else{
+                    initialCoord.vertNum = 1;
                     goto horrible;
                 }
             }else if (direct == 1){
@@ -303,6 +307,7 @@ static coord pathToVertex(path inPath){
                     initialCoord.y -= 1;
                     direct = 2;
                 }else{
+                    initialCoord.vertNum = 1;
                     goto horrible;
                 }
             }else if (direct == 2){
@@ -316,6 +321,7 @@ static coord pathToVertex(path inPath){
                     initialCoord.x += 1;
                     direct = 1;
                 }else{
+                    initialCoord.vertNum = 1;
                     goto horrible;
                 }
             }
@@ -325,9 +331,13 @@ static coord pathToVertex(path inPath){
         default:break;
         }
     }
+    
+    if(0){
+        horrible: puts("invalid input, returning result of last valid input.\n");
+    }
+    
     return initialCoord;
-    horrible: puts("invalid input, returning result of last valid input. BTW your PC is gonna explode");
-    return initialCoord;
+    
 }
 
 // Move an imaginary point along the path. If at any time the point 
