@@ -223,14 +223,30 @@ static int coordToRegID(coord inCoord) {
 }
 
 //returns the coordinate and the corresponding vertex of a given path
+//JAMES & TIM, I decided to use the 3 direction model because it seems like I'm always
+//missing something with the 6 direction one.
 static coord pathToVertex(path inPath){
     int count = 0; // set a counter to determine which step
     coord initialCoord = {.x = 3,.y = 5,.arcNum = -1,.vertNum = 0};   
     int direct = 2; //each vertex(0,1) can have 3 directions, each direction has 3 path(L,B,R)
     
+    
+    //basically there are 2*3*3 possible ways of moving along the board
+    //for each vertex(0 or 1), there are 3 directions it can take, and for each direction
+    //there are "L" "R" or "B" ways of moving. depending on the direction, each move produces 
+    //a differnt effect, but is consistent
+    
+    //for vertex 0
+    //direct 0 contains: left-up == left, left-down == right
+    //direct 1 contains: right == right, left-upward == left
+    //direct 2 contains: right == left, left-down == right
+    
+    //vertex 1 is the complete opposite of vertex 2 in terms of left and right
+    //e.g. direct 0 contains: right-up == left, right-down == right
+    
     while (inPath[count] != '\0'){
         switch (initialCoord.vertNum){
-        case 0: //vertex 1 
+        case 0: //vertex 0
             initialCoord.vertNum = 1;
             if (direct == 0){
                 initialCoord.x -= 1;
@@ -268,7 +284,7 @@ static coord pathToVertex(path inPath){
                 }
             }
             count++;break;
-        case 1: //vertex 2
+        case 1: //vertex 1
             initialCoord.vertNum = 0;
             if (direct == 0){
                 initialCoord.x += 1;
@@ -354,8 +370,13 @@ static coord pathToARC(path inPath){
                     initialCoord.arcNum = 0;
                 }
             }else if (direct == 2){
+                // for direct 2, it assumes that the path is comming from left-up position(which is
+                //probably the only path) so it needs to adjust it's coordinate
+                //e.g starting from Arc 3 of coord 2,5 it must change to coord 3,4 no matter what step is taken
+                //(excluding back)
                 initialCoord.vertNum = 1;
-                if (!(initialCoord.x == 3 && initialCoord.y == 5)){
+                if (!(initialCoord.x == 3 && initialCoord.y == 5)){ //initially, no path leads to the starting point
+                // so we can't assume there is a path, therefore the coord must remain unchanged
                     initialCoord.x += 1;
                     initialCoord.y -= 1;
                 }if (inPath[count] == 'L'){
@@ -399,7 +420,7 @@ static coord pathToARC(path inPath){
                     initialCoord.arcNum = 2;
                 }
             }else if (direct == 2){
-                initialCoord.x -= 1;
+                initialCoord.x -= 1; //coord adjustment assuming path from right up.
                 if (inPath[count] == 'L'){
                     direct = 2;
                     initialCoord.arcNum = 2;
