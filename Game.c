@@ -222,6 +222,113 @@ static int coordToRegID(coord inCoord) {
     return newRegID;
 }
 
+//returns the coordinate and specified vertex of a given path
+static coord pathToVertex(path inPath){
+    int count = 0; // set a counter to determine which step
+    char path = *(inPath+count);
+    coord initialCoord = {.x = 3,.y = 5,.arcNum = -1,.vertNum = 0};   
+    int direct = 2; //three directions 0,1,2 
+    
+    while (path != '\0'){
+        switch (initialCoord.vertNum){
+        case 0:
+            initialCoord.vertNum = 1;
+            if (direct == 0){
+                initialCoord.x -= 1;
+                if (path == 'L'){
+                    direct = 2;
+                }else if (path == 'R'){
+                    initialCoord.y += 1;
+                    direct = 1;
+                }else if (path == 'B'){
+                    initialCoord.x += 1;
+                    direct = 0;
+                }else{
+                    goto horrible;
+                }
+            }else if (direct == 1){
+                if (path == 'L'){
+                    initialCoord.x -= 1;
+                    initialCoord.y += 1;
+                    direct = 1;
+                }else if (path == 'R'){
+                    direct = 0;
+                }else if (path == 'B'){
+                    initialCoord.x -= 1;
+                    direct = 2;
+                }else{
+                    goto horrible;
+                }
+            }else if (direct == 2){
+                initialCoord.vertNum = 1;
+                if (path == 'L'){
+                    direct = 0;
+                }else if (path == 'R'){
+                    initialCoord.x -= 1;
+                    direct = 2;
+                }else if (path == 'B'){
+                    initialCoord.x -= 1;
+                    initialCoord.y += 1;
+                    direct = 1;
+                }else{
+                    goto horrible;
+                }
+            }
+            count++;
+            path = *(inPath + count);
+            break;
+        case 1:
+            initialCoord.vertNum = 0;
+            if (direct == 0){
+                initialCoord.x += 1;
+                if (path == 'L'){
+                    direct = 1;
+                }else if (path == 'R'){
+                    initialCoord.y -= 1;
+                    direct = 2;
+                }else if (path == 'B'){
+                    initialCoord.x -= 1;
+                    direct = 0;
+                }else{
+                    goto horrible;
+                }
+            }else if (direct == 1){
+                if (path == 'L'){
+                    direct = 0;
+                }else if (path == 'R'){
+                    initialCoord.x += 1;
+                    direct = 1;
+                }else if (path == 'B'){
+                    initialCoord.x += 1;
+                    initialCoord.y -= 1;
+                    direct = 2;
+                }else{
+                    goto horrible;
+                }
+            }else if (direct == 2){
+                if (path == 'L'){
+                    initialCoord.x += 1;
+                    initialCoord.y -= 1;
+                    direct = 2;
+                }else if (path == 'R'){
+                    direct = 0;
+                }else if (path == 'B'){
+                    initialCoord.x += 1;
+                    direct = 1;
+                }else{
+                    goto horrible;
+                }
+            }
+            count++;
+            path = *(inPath + count);
+            break;
+        default:break;
+        }
+    }
+    return initialCoord;
+    horrible: puts("invalid input, returning result of last valid input. BTW your PC is gonna explode");
+    return initialCoord;
+}
 
 // Move an imaginary point along the path. If at any time the point 
 // exits the game board, it means the path ISN'T contained. If the 
