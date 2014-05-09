@@ -149,6 +149,9 @@ static int isPathContained(path inPath);
 static int isARCConnected(path inPath, int player);
 static int isCampusConnected(path inPath, int player);
 
+// returns true if there are campuses next to the vertex at inPath
+static int isCampusTooClose(Game g, path inPath);
+
 
 // =====================================================================
 //   STATIC FUNCTION DECLARATIONS END
@@ -223,98 +226,102 @@ static int coordToRegID(coord inCoord) {
 }
 
 //returns the coordinate and the corresponding vertex of a given path
-//JAMES & TIM, I decided to use the 3 direction model because it seems like I'm always
-//missing something with the 6 direction one.
-static coord pathToVertex(path inPath){
-    int count = 0; // set a counter to determine which step
+//JAMES & TIM, I decided to use the 3 direction model because it seems 
+// like I'm always missing something with the 6 direction one.
+static coord pathToVertex(path inPath) {
+    // set a counter to determine which step
+    int count = 0;
     coord initialCoord = {.x = 3,.y = 5,.arcNum = -1,.vertNum = 0};   
-    int direct = 2; //each vertex(0,1) can have 3 directions, each direction has 3 path(L,B,R)
+    // each vertex (0,1) can have 3 directions, 
+    // each direction has 3 paths (L,B,R)
+    int direct = 2;
     
+    // basically there are 2*3*3 possible ways of moving along the board
+    // for each vertex(0 or 1), there are 3 directions it can take, and 
+    // for each direction there are "L" "R" or "B" ways of moving. 
+    // depending on the direction, each move produces a different effect
     
-    //basically there are 2*3*3 possible ways of moving along the board
-    //for each vertex(0 or 1), there are 3 directions it can take, and for each direction
-    //there are "L" "R" or "B" ways of moving. depending on the direction, each move produces 
-    //a differnt effect, but is consistent
+    // for vertex 0
+    // direct 0 contains: left-up == left, left-down == right
+    // direct 1 contains: right == right, left-upward == left
+    // direct 2 contains: right == left, left-down == right
     
-    //for vertex 0
-    //direct 0 contains: left-up == left, left-down == right
-    //direct 1 contains: right == right, left-upward == left
-    //direct 2 contains: right == left, left-down == right
+    // vertex 1 is the opposite of vertex 2 in terms of left and right 
+    // e.g. direct 0 contains: right-up == left, right-down == right
     
-    //vertex 1 is the complete opposite of vertex 2 in terms of left and right
-    //e.g. direct 0 contains: right-up == left, right-down == right
-    
-    while (inPath[count] != '\0'){
-        if (!initialCoord.vertNum){ //vertex 0
+    while (inPath[count] != '\0') {
+        // vertex 0
+        if (!initialCoord.vertNum) {
             initialCoord.vertNum = 1;
-            if (direct == 0){
+            if (direct == 0) {
                 initialCoord.x -= 1;
-                if (inPath[count] == 'L'){
+                if (inPath[count] == 'L') {
                     direct = 2;
-                }else if (inPath[count] == 'R'){
+                } else if (inPath[count] == 'R') {
                     initialCoord.y += 1;
                     direct = 1;
-                }else if (inPath[count] == 'B'){
+                } else if (inPath[count] == 'B') {
                     initialCoord.x += 1;
                     direct = 0;
                 }
-            }else if (direct == 1){
-                if (inPath[count]  == 'L'){
+            } else if (direct == 1) {
+                if (inPath[count]  == 'L') {
                     initialCoord.x -= 1;
                     initialCoord.y += 1;
                     direct = 1;
-                }else if (inPath[count]  == 'R'){
+                } else if (inPath[count]  == 'R') {
                     direct = 0;
-                }else if (inPath[count]  == 'B'){
+                } else if (inPath[count]  == 'B') {
                     initialCoord.x -= 1;
                     direct = 2;
                 }
-            }else if (direct == 2){
+            } else if (direct == 2) {
                 initialCoord.vertNum = 1;
-                if (inPath[count]  == 'L'){
+                if (inPath[count]  == 'L')  {
                     direct = 0;
-                }else if (inPath[count]  == 'R'){
+                } else if (inPath[count]  == 'R') {
                     initialCoord.x -= 1;
                     direct = 2;
-                }else if (inPath[count]  == 'B'){
+                } else if (inPath[count]  == 'B') {
                     initialCoord.x -= 1;
                     initialCoord.y += 1;
                     direct = 1;
                 }
             }
             count++;
-        }else if(initialCoord.vertNum == 1){ //vertex 1
+        } else if(initialCoord.vertNum == 1) {
+            // vertex 1
             initialCoord.vertNum = 0;
-            if (direct == 0){
+            if (direct == 0) {
                 initialCoord.x += 1;
-                if (inPath[count] == 'L'){
+                if (inPath[count] == 'L') {
                     direct = 1;
-                }else if (inPath[count]  == 'R'){
+                } else if (inPath[count]  == 'R') {
                     initialCoord.y -= 1;
                     direct = 2;
-                }else if (inPath[count]  == 'B'){
+                } else if (inPath[count]  == 'B') {
                     initialCoord.x -= 1;
                     direct = 0;
                 }
-            }else if (direct == 1){
-                if (inPath[count]  == 'L'){
+            } else if (direct == 1) {
+                if (inPath[count]  == 'L') {
                     direct = 0;
-                }else if (inPath[count]  == 'R'){
+                } else if (inPath[count]  == 'R') {
                     initialCoord.x += 1;
                     direct = 1;
-                }else if (inPath[count]  == 'B'){
+                } else if (inPath[count]  == 'B') {
                     initialCoord.x += 1;
                     initialCoord.y -= 1;
                     direct = 2;
                 }
-            }else if (direct == 2){
-                if (inPath[count] == 'L'){
+            } else if (direct == 2) {
+                if (inPath[count] == 'L') {
                     initialCoord.x += 1;
                     initialCoord.y -= 1;
                     direct = 2;
-                }else if (inPath[count] == 'R'){
+                } else if (inPath[count] == 'R') {
                     direct = 0;
-                }else if (inPath[count]  == 'B'){
+                } else if (inPath[count]  == 'B') {
                     initialCoord.x += 1;
                     direct = 1;
                 }
@@ -325,63 +332,66 @@ static coord pathToVertex(path inPath){
     return initialCoord;
 }
 
-static coord pathToARC(path inPath){
+static coord pathToARC(path inPath) {
     int count = 0;
     coord initialCoord = { .x = 3, .y = 5, .arcNum = -1, .vertNum = 0 };
-    //vertNum set to 0 or 1 to determine which vertex currently on, doesn't matter what 
-    //coordinate
-    //arcNum set to -1 because initially there is no arc, so it returns -1 if player 
-    //didn't enter a path
+    // vertNum set to 0 or 1 to determine which vertex currently on, 
+    // doesn't matter what coordinate
+    // arcNum set to -1 because initially there is no arc, 
+    // so it returns -1 if player didn't enter a path
 
     int direct = 2; //three directions 0,1,2 
     
-    while (inPath[count]!='\0'){
-         if (!initialCoord.vertNum){
+    while (inPath[count]!='\0') {
+         if (!initialCoord.vertNum) {
             initialCoord.vertNum = 1;
-            if (direct == 0){
-                if (inPath[count] == 'L'){
+            if (direct == 0) {
+                if (inPath[count] == 'L') {
                     initialCoord.arcNum = 0;
                     direct = 2;
-                  
-                }else if (inPath[count] == 'R'){
+                } else if (inPath[count] == 'R') {
                     initialCoord.x -= 1;
                     initialCoord.y += 1;
                     initialCoord.arcNum = 2;
                     direct = 1;
-                }else if (inPath[count] == 'B'){
+                } else if (inPath[count] == 'B') {
                     direct = 0;
                     initialCoord.arcNum = 1;
                 }
-            }else if (direct == 1){
-                if (inPath[count] == 'L'){
+            } else if (direct == 1) {
+                if (inPath[count] == 'L') {
                     initialCoord.x -= 1;
                     initialCoord.y += 1;
                     initialCoord.arcNum = 2;
                     direct = 1;
-                }else if (inPath[count] == 'R'){
+                } else if (inPath[count] == 'R') {
                     direct = 0;
                     initialCoord.arcNum = 1;
-                }else if (inPath[count] == 'B'){
+                } else if (inPath[count] == 'B') {
                     direct = 2;
                     initialCoord.arcNum = 0;
                 }
-            }else if (direct == 2){
-                // for direct 2, it assumes that the path is comming from left-up position(which is
-                //probably the only path) so it needs to adjust it's coordinate
-                //e.g starting from Arc 3 of coord 2,5 it must change to coord 3,4 no matter what step is taken
-                //(excluding back)
+            } else if (direct == 2) {
+                // for direct 2, it assumes that the path is comming 
+                // from left-up position (which is probably the only 
+                // path) so it needs to adjust it's coordinate e.g 
+                // starting from Arc 3 of coord 2,5 it must change to 
+                // coord 3,4 no matter what step is taken 
+                // (excluding back)
                 initialCoord.vertNum = 1;
-                if (!(initialCoord.x == 3 && initialCoord.y == 5)){ //initially, no path leads to the starting point
-                // so we can't assume there is a path, therefore the coord must remain unchanged
+                //initially, no path leads to the starting point
+                // so we can't assume there is a path, therefore the 
+                // coord must remain unchanged
+                if (!(initialCoord.x == 3 && initialCoord.y == 5)) { 
                     initialCoord.x += 1;
                     initialCoord.y -= 1;
-                }if (inPath[count] == 'L'){
+                }if (inPath[count] == 'L') {
                     direct = 0;
                     initialCoord.arcNum = 1;
-                }else if (inPath[count] == 'R'){
+                } else if (inPath[count] == 'R') {
                     direct = 2;
                     initialCoord.arcNum = 0;
-                }else if (inPath[count] == 'B'){
+                } else if (inPath[count] == 'B') {
                     initialCoord.x -= 1;
                     initialCoord.y += 1;
                     direct = 1;
@@ -389,48 +399,49 @@ static coord pathToARC(path inPath){
                 }
             }
             count++;
-        }else if(initialCoord.vertNum == 1){
+         } else if(initialCoord.vertNum == 1) {
             initialCoord.vertNum = 0;
-            if (direct == 0){
-                if (inPath[count] == 'L'){
+            if (direct == 0) {
+                if (inPath[count] == 'L') {
                     initialCoord.x += 1;
                     direct = 1;
                     initialCoord.arcNum = 0;
-                }else if (inPath[count] == 'R'){
+                } else if (inPath[count] == 'R') {
                     initialCoord.arcNum = 2;
                     direct = 2;
-                }else if (inPath[count] == 'B'){
+                } else if (inPath[count] == 'B') {
                     initialCoord.arcNum = 1;
                     direct = 0;
                 }
-            }else if (direct == 1){
-                if (inPath[count] == 'L'){
+            } else if (direct == 1) {
+                if (inPath[count] == 'L') {
                     direct = 0;
                     initialCoord.arcNum = 1;
-                }else if (inPath[count] == 'R'){
+                } else if (inPath[count] == 'R') {
                     initialCoord.x += 1;
                     direct = 1;
                     initialCoord.arcNum = 0;
-                }else if (inPath[count] == 'B'){
+                } else if (inPath[count] == 'B') {
                     direct = 2;
                     initialCoord.arcNum = 2;
                 }
-            }else if (direct == 2){
-                initialCoord.x -= 1; //coord adjustment assuming path from right up.
-                if (inPath[count] == 'L'){
+            } else if (direct == 2) {
+                //coord adjustment assuming path from right up.
+                initialCoord.x -= 1; 
+                if (inPath[count] == 'L') {
                     direct = 2;
                     initialCoord.arcNum = 2;
-                }else if (inPath[count] == 'R'){
+                } else if (inPath[count] == 'R') {
                     direct = 0;
                     initialCoord.arcNum = 1;
-                }else if (inPath[count] == 'B'){
+                } else if (inPath[count] == 'B') {
                     initialCoord.x += 1;
                     direct = 1;
                     initialCoord.arcNum = 0;
                 }
             }
             count++;
-            }
+        }
     }
     initialCoord.vertNum = -1;
     return initialCoord;
@@ -510,6 +521,33 @@ static int isPathContained(path inPath) {
 }
 
 
+// Returns true if there are campuses adjacent to the vertex located at
+// path "inPath"
+static int isCampusTooClose(Game g, path inPath) {
+    int isTooClose == FALSE;
+    coord c = pathToVertex(inPath);
+    if (c.vertNum == 0) {
+        if (g->grid[c.x][c.y].vertices[1] != VACANT_VERTEX) {
+            isTooClose == TRUE;
+        } else if (g->grid[c.x-1][c.y].vertices[1] != VACANT_VERTEX) {
+            isTooClose == TRUE;
+        } else if (g->grid[c.x-1][c.y+1].vertices[1] != VACANT_VERTEX) {
+            isTooClose == TRUE;
+        }
+    } else if (c.vertNum == 1) {
+        if (g->grid[c.x][c.y].vertices[0] != VACANT_VERTEX) {
+            isTooClose == TRUE;
+        } else if (g->grid[c.x+1][c.y].vertices[0] != VACANT_VERTEX) {
+            isTooClose == TRUE;
+        } else if (g->grid[c.x+1][c.y-1].vertices[0] != VACANT_VERTEX) {
+            isTooClose == TRUE;
+        }
+    }
+
+    return isTooClose;
+}
+
+
 // =====================================================================
 //   STATIC FUNCTIONS END
 //   API FUNCTIONS BEGIN
@@ -566,6 +604,11 @@ Game newGame (int discipline[], int dice[]) {
             } else {
                 g->grid[column][row].resType = -1;
                 g->grid[column][row].diceNum = -1;
+                g->grid[column][row].vertices[0] = VACANT_VERTEX;
+                g->grid[column][row].vertices[1] = VACANT_VERTEX;
+                g->grid[column][row].arcs[0] = VACANT_ARC;
+                g->grid[column][row].arcs[1] = VACANT_ARC;
+                g->grid[column][row].arcs[2] = VACANT_ARC;
             }
             column++;
         }
@@ -684,7 +727,6 @@ int getWhoseTurn (Game g) {
 
 // return the contents of the given vertex (ie campus code or 
 // VACANT_VERTEX)
-//I changed (path pathTovertex) to inPath since I'm using the function pathToVertex
 int getCampus(Game g, path inPath) {
      //get the 2d coord of the path
      coord vertex = pathToVertex(inPath);
@@ -730,7 +772,7 @@ int isLegalAction (Game g, action a) {
     }
     
     // check that conditions are satisfied for building a campus
-    if (a.actionCode == BUILD_CAMPUS){
+    if (a.actionCode == BUILD_CAMPUS) {
         int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_BPS);
         int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_BQN);
         int resourceC = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
@@ -746,13 +788,20 @@ int isLegalAction (Game g, action a) {
             isLegal = FALSE;
         }
 
+        // check the campus is connected to one of the player's ARCs
         if (isCampusConnected(a.destination, getWhoseTurn(g)) 
                 == FALSE) {
             isLegal = FALSE;
         }
+
+        // is the vertex we are building at adjacent to another campus
+        if (isCampusTooClose(g, a.destination) == TRUE) {
+            isLegal = FALSE;
+        }
     }
 
-    if (a.actionCode == BUILD_GO8){
+    // check that conditions are satisfied for building a GO8
+    if (a.actionCode == BUILD_GO8) {
         int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
         int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_MMONEY);
 
@@ -767,7 +816,7 @@ int isLegalAction (Game g, action a) {
         }
     }
 
-    if (a.actionCode == OBTAIN_ARC){
+    if (a.actionCode == OBTAIN_ARC) {
         int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_BPS);
         int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_BQN);
 
