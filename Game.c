@@ -146,11 +146,14 @@ static int isPathContained(path inPath);
 // destination vertex to ensure there are arcs adjacent. When building 
 // an ARC, call isARCConnected on the destination edge to ensure an
 // ARC or campus is adjacent
-static int isARCConnected(path inPath, int player);
-static int isCampusConnected(path inPath, int player);
+// static int isARCConnected(path inPath, int player);
+// static int isCampusConnected(path inPath, int player);
 
 // returns true if there are campuses next to the vertex at inPath
 static int isCampusTooClose(Game g, path inPath);
+
+// returns true if the coordinate is inside the board
+static int isCoordInside(coord c);
 
 
 // =====================================================================
@@ -186,40 +189,18 @@ static coord regIDToCoord(int regID) {
 // outside the board
 static int coordToRegID(coord inCoord) {
     int newRegID;
-    if (inCoord.x < 1) {
-        newRegID = OUTSIDE_BOARD;
+    if (isCoordInside(inCoord) == FALSE) {
+        newRegID = -1;
     } else if (inCoord.x < 2) {
-        if (inCoord.y < 3) {
-            newRegID = OUTSIDE_BOARD;
-        } else {
-            newRegID = 5 - inCoord.y;
-        }
+        newRegID = 5 - inCoord.y;
     } else if (inCoord.x < 3) {
-        if (inCoord.y < 2) {
-            newRegID = OUTSIDE_BOARD;
-        } else {
-            newRegID = 8 - inCoord.y;
-        }
+        newRegID = 8 - inCoord.y;
     } else if (inCoord.x < 4) {
-        if (inCoord.y < 1) {
-            newRegID = OUTSIDE_BOARD;
-        } else {
-            newRegID = 12 - inCoord.y;
-        }
+        newRegID = 12 - inCoord.y;
     } else if (inCoord.x < 5) {
-        if (inCoord.y < 1 || inCoord.y > 4) {
-            newRegID = OUTSIDE_BOARD;
-        } else {
-            newRegID = 16 - inCoord.y;
-        }
-    } else if (inCoord.x < 6) {
-        if (inCoord.y < 1 || inCoord.y > 3) {
-            newRegID = OUTSIDE_BOARD;
-        } else {
-            newRegID = 19 - inCoord.y;
-        }
+        newRegID = 16 - inCoord.y;
     } else {
-        newRegID = OUTSIDE_BOARD;
+        newRegID = 19 - inCoord.y;
     }
 
     return newRegID;
@@ -505,10 +486,8 @@ static int isPathContained(path inPath) {
             currentCoord.x--;
         } 
 
-        // coordToRegID returns -1 if outside board so we can use that 
-        // to our advantage to check if the coordinate we ended up at
-        // is inside the board or not
-        if (coordToRegID(currentCoord) == -1) {
+        // check to see if our coordinate ends up outside the board
+        if (isCoordInside(currentCoord) == FALSE) {
             isContained = FALSE;
         }
 
@@ -524,27 +503,94 @@ static int isPathContained(path inPath) {
 // Returns true if there are campuses adjacent to the vertex located at
 // path "inPath"
 static int isCampusTooClose(Game g, path inPath) {
-    int isTooClose == FALSE;
+    int isTooClose = FALSE;
     coord c = pathToVertex(inPath);
     if (c.vertNum == 0) {
         if (g->grid[c.x][c.y].vertices[1] != VACANT_VERTEX) {
-            isTooClose == TRUE;
-        } else if (g->grid[c.x-1][c.y].vertices[1] != VACANT_VERTEX) {
-            isTooClose == TRUE;
-        } else if (g->grid[c.x-1][c.y+1].vertices[1] != VACANT_VERTEX) {
-            isTooClose == TRUE;
+            isTooClose = TRUE;
+        } 
+        if (g->grid[c.x-1][c.y].vertices[1] != VACANT_VERTEX) {
+            isTooClose = TRUE;
+        } 
+        if (g->grid[c.x-1][c.y+1].vertices[1] != VACANT_VERTEX) {
+            isTooClose = TRUE;
         }
     } else if (c.vertNum == 1) {
         if (g->grid[c.x][c.y].vertices[0] != VACANT_VERTEX) {
-            isTooClose == TRUE;
-        } else if (g->grid[c.x+1][c.y].vertices[0] != VACANT_VERTEX) {
-            isTooClose == TRUE;
-        } else if (g->grid[c.x+1][c.y-1].vertices[0] != VACANT_VERTEX) {
-            isTooClose == TRUE;
+            isTooClose = TRUE;
+        } 
+        if (g->grid[c.x+1][c.y].vertices[0] != VACANT_VERTEX) {
+            isTooClose = TRUE;
+        }
+        if (g->grid[c.x+1][c.y-1].vertices[0] != VACANT_VERTEX) {
+            isTooClose = TRUE;
         }
     }
 
     return isTooClose;
+}
+
+
+// Returns true if the coordinate is inside the board, false otherwise
+// the original way of doing this was to check if coordToRegID returned
+// -1, however that wouldn't work for hexes that lay outside the board
+// but had their top edges inside the board
+static int isCoordInside(coord c) {
+    int isInside = FALSE;
+    
+    // if we are clearly inside the board
+    if (c.x == 1 && c.y > 2 && c.y < 6) {
+        isInside = TRUE;
+    } else if (c.x == 2 && c.y > 1 && c.y < 6) {
+        isInside = TRUE;
+    } else if (c.x == 3 && c.y > 0 && c.y < 6) {
+        isInside = TRUE;
+    } else if (c.x == 4 && c.y > 0 && c.y < 5) {
+        isInside = TRUE;
+    } else if (c.x == 5 && c.y > 0 && c.y < 4) {
+        isInside = TRUE;
+    }
+
+    // if we are on the left edge of the board, hex is outside
+    if (c.x == 0 && c.y > 2 && c.y < 6 
+            && (c.arcNum == 2 || c.vertNum == 1)) {
+        isInside = TRUE;
+    }
+
+    // if we are on the right edge of the board, hex is outside
+    if (c.x == 6 && c.y > -1 && c.y < 3 
+            && (c.arcNum == 0 || c.vertNum == 0)) {
+        isInside = TRUE;
+    }
+
+    // if we are on the right edge of the board, hex is outside
+    if (c.x == 6 && c.y > -1 && c.y < 3 
+            && (c.arcNum == 0 || c.vertNum == 0)) {
+        isInside = TRUE;
+    }
+
+    // if we are on the bottom right edge of the board, hex is outside
+    if (c.y == 0 && c.x > 2 && c.y < 6) {
+        if (c.x == 3) {
+            if (c.arcNum == 1 || c.vertNum == 0 || c.vertNum == 1) {
+                isInside = TRUE;
+            }
+        } else {
+            if (c.arcNum == 0 || c.arcNum == 1 || c.vertNum == 0 
+                    || c.vertNum == 1) {
+                isInside = TRUE;
+            }
+        }
+    }
+
+    // if we are on the bottom left edge of the board, hex is outside
+    if (c.x + c.y == 3 && c.x < 3 && c.x > 0
+            && (c.arcNum == 1 || c.arcNum == 2 || c.vertNum == 0 
+                || c.vertNum == 1)) {
+        isInside = TRUE;
+    }
+
+    return isInside;
 }
 
 
@@ -590,8 +636,7 @@ Game newGame (int discipline[], int dice[]) {
     while (row < GRID_HEIGHT) {
         while (column < GRID_WIDTH) {
             coord currentCoord = {.x = column, .y = row};
-            int regID = coordToRegID(currentCoord);
-            if (regID != -1) {
+            if (isCoordInside(currentCoord)) {
                 g->grid[column][row].resType 
                     = discipline[coordToRegID(currentCoord)];
                 g->grid[column][row].diceNum 
@@ -789,10 +834,12 @@ int isLegalAction (Game g, action a) {
         }
 
         // check the campus is connected to one of the player's ARCs
+        /*
         if (isCampusConnected(a.destination, getWhoseTurn(g)) 
                 == FALSE) {
             isLegal = FALSE;
         }
+        */
 
         // is the vertex we are building at adjacent to another campus
         if (isCampusTooClose(g, a.destination) == TRUE) {
@@ -831,9 +878,11 @@ int isLegalAction (Game g, action a) {
         }
 
         // check the player has connected arcs/campuses
+        /*
         if (isARCConnected(a.destination, getWhoseTurn(g)) == FALSE) {
             isLegal = FALSE;
         }
+        */
     }
     return isLegal;
 }
