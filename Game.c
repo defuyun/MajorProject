@@ -25,7 +25,11 @@
 #define NUM_VERTICES_PER_HEX 2
 #define NUM_RETRAINS_PER_HEX 2
 #define NUM_DISCIPLINES 6
+#define NUM_RETRAINING_CENTRES 10
+#define DISCOUNT_EXCHANGE_RATE 2
+#define DEFAULT_EXCHANGE_RATE 3
 #define OUTSIDE_BOARD -1
+
 
 
 // =====================================================================
@@ -938,6 +942,21 @@ int getStudents (Game g, int player, int discipline) {
     return g->studentAmounts[player-1][discipline];
 }
 
+// type of retraining centres
+int retrainType[NUM_RETRAINING_CENTRES] = {
+    STUDENT_MTV, STUDENT_MTV,
+    STUDENT_MMONEY, STUDENT_MMONEY,
+    STUDENT_BQN, STUDENT_BQN,
+    STUDENT_MJ, STUDENT_MJ,
+    STUDENT_BPS, STUDENT_BPS};
+
+// location of the retraining centres
+char retrainLocation[NUM_RETRAINING_CENTRES][PATH_LIMIT] = {
+    {"R"}, {"RR"},
+    {"LR"}, {"LRL"},
+    {"LRLRLRRL"}, {"LRLRLRRLR"},
+    {"LRLRLRRLRLRR"}, {"LRLRLRRLRLRRL"},
+    {"LRLRLRRLRLRRLRLRRL"}, {"LRLRLRRLRLRRLRLRRLR"}};
 
 // return how many students of discipline type disciplineFrom
 // the specified player would need to retrain in order to get one 
@@ -945,11 +964,91 @@ int getStudents (Game g, int player, int discipline) {
 // on what retraining centers, if any, they have a campus at.
 int getExchangeRate (Game g, int player, 
                      int disciplineFrom, int disciplineTo) {
-    // assume exchange rate is 3, search through entire g-grid[x][y] 
-    // and if you find a retraining center of the correct type with a 
-    // campus owned by player at it, change it to 2
-    int e = 3;
-    // *** do search ***
-    return e;
-}
 
+    // checks that the discipline that
+    // wants to be retrained is not a THD
+    assert(disciplineFrom != STUDENT_THD);
+
+    // checks that the discipline that
+    // wants to be trained into is valid
+    assert((disciplineTo == STUDENT_THD)  ||
+           (disciplineTo == STUDENT_BPS)  ||
+           (disciplineTo == STUDENT_BQN)  ||
+           (disciplineTo == STUDENT_MJ )  ||
+           (disciplineTo == STUDENT_MTV)  ||
+           (disciplineTo == STUDENT_MMONEY));
+
+    // by default, exchange rate is 3. If a player's campus lies
+    // on a retraining centre, the exchange rate to retrain a
+    // discipline (identical to the type of retraining centre)
+    // falls to 2.
+    int exchangeRate = DEFAULT_EXCHANGE_RATE;
+    int x = 0;
+    int y = 0;
+    int z = 0;
+
+    while(y < GRID_HEIGHT) {
+        while(x < GRID_WIDTH) {
+            while(z < NUM_VERTICES_PER_HEX){
+                if(disciplineFrom == STUDENT_MTV) {
+                    if(g->grid[x][y].vertices[z] == 
+                       g->grid[2][5].vertices[0] ||
+                       g->grid[x][y].vertices[z] ==
+                       g->grid[2][5].vertices[1]) {
+                        exchangeRate = DISCOUNT_EXCHANGE_RATE;
+                        x = GRID_WIDTH;
+                        y = GRID_HEIGHT;
+                        z = NUM_VERTICES_PER_HEX;                        
+                    }
+                } else if(disciplineFrom == STUDENT_MMONEY) {
+                    if(g->grid[x][y].vertices[z] ==
+                       g->grid[4][4].vertices[0] ||
+                       g->grid[x][y].vertices[z] ==
+                       g->grid[4][4].vertices[1]) {
+                        exchangeRate = DISCOUNT_EXCHANGE_RATE;
+                        x = GRID_WIDTH;
+                        y = GRID_HEIGHT;
+                        z = NUM_VERTICES_PER_HEX; 
+                    }
+                } else if(disciplineFrom == STUDENT_BQN) {
+                    if(g->grid[x][y].vertices[z] ==
+                       g->grid[6][1].vertices[0] ||
+                       g->grid[x][y].vertices[z] ==
+                       g->grid[5][1].vertices[1]) {
+                        exchangeRate = DISCOUNT_EXCHANGE_RATE;
+                        x = GRID_WIDTH;
+                        y = GRID_HEIGHT;
+                        z = NUM_VERTICES_PER_HEX; 
+                    }
+                } else if(disciplineFrom == STUDENT_MJ) {
+                    if(g->grid[x][y].vertices[z] ==
+                       g->grid[5][0].vertices[0] ||
+                       g->grid[x][y].vertices[z] ==
+                       g->grid[4][0].vertices[1]) {
+                        exchangeRate = DISCOUNT_EXCHANGE_RATE;
+                        x = GRID_WIDTH;
+                        y = GRID_HEIGHT;
+                        z = NUM_VERTICES_PER_HEX; 
+                    }
+                } else if(disciplineFrom == STUDENT_BPS) {
+                    if(g->grid[x][y].vertices[z] ==
+                       g->grid[1][2].vertices[1] ||
+                       g->grid[x][y].vertices[z] ==
+                       g->grid[2][1].vertices[0]) {
+                        exchangeRate = DISCOUNT_EXCHANGE_RATE;
+                        x = GRID_WIDTH;
+                        y = GRID_HEIGHT;
+                        z = NUM_VERTICES_PER_HEX; 
+                    }
+                }
+                z++;
+            }
+            x++;
+            z = 0;
+        }
+        y++;
+        x = 0;
+    }
+
+    return exchangeRate;
+}
