@@ -942,21 +942,6 @@ int getStudents (Game g, int player, int discipline) {
     return g->studentAmounts[player-1][discipline];
 }
 
-// type of retraining centres
-int retrainType[NUM_RETRAINING_CENTRES] = {
-    STUDENT_MTV, STUDENT_MTV,
-    STUDENT_MMONEY, STUDENT_MMONEY,
-    STUDENT_BQN, STUDENT_BQN,
-    STUDENT_MJ, STUDENT_MJ,
-    STUDENT_BPS, STUDENT_BPS};
-
-// location of the retraining centres
-char retrainLocation[NUM_RETRAINING_CENTRES][PATH_LIMIT] = {
-    {"R"}, {"RR"},
-    {"LR"}, {"LRL"},
-    {"LRLRLRRL"}, {"LRLRLRRLR"},
-    {"LRLRLRRLRLRR"}, {"LRLRLRRLRLRRL"},
-    {"LRLRLRRLRLRRLRLRRL"}, {"LRLRLRRLRLRRLRLRRLR"}};
 
 // return how many students of discipline type disciplineFrom
 // the specified player would need to retrain in order to get one 
