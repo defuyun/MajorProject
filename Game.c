@@ -888,6 +888,33 @@ int isLegalAction (Game g, action a) {
         }
         */
     }
+    
+    if (a.actionCode == START_SPINOFF) {
+        int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
+        int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_MTV);
+        int resourceC = getStudents(g, getWhoseTurn(g), STUDENT_MMONEY);
+        //check if player has enough resource to start spinoff
+        if (resourceA < 1 || resourceB < 1 || resouceC < 1) {
+            isLegal = FALSE;
+        }
+    }
+    
+    if (a.actionCode == RETRAIN_STUDENTS) {
+        int resourceA = getStudents(g, getWhoseTurn(g), a.disciplineFrom);
+        int resourceB = getStudents(g, getWhoseTurn(g), a.disciplineTo);
+        
+        //check if the user entered a valid student type
+        if ((resourceA > 5 && resourceA < 1) 
+                || (resourceB > 5 && resourceB < 0)) {
+            isLegal = FALSE;
+        }
+        
+        //can't retrain when player has less than 2 student
+        if (resourceA < 2) {
+            isLegal = FALSE
+        }
+    }
+    
     return isLegal;
 }
 
