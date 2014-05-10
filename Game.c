@@ -786,8 +786,8 @@ int getCampus(Game g, path inPath) {
 // return the contents of the given edge (ie ARC code or vacant ARC)
 int getARC(Game g, path pathToEdge) {
     //get the 2d coord of the path
-    coord vertex = pathToARC(pathToEdge);
-    return g->grid[vertex.x][vertex.y].vertices[vertex.arcNum];
+    coord arc = pathToARC(pathToEdge);
+    return g->grid[arc.x][arc.y].arcs[arc.arcNum];
 }
 
 
