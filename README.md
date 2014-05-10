@@ -13,7 +13,7 @@ List of things to do:
     * James
 * ~~makeAction()~~
     * Matt
-* throwDice()
+* ~~throwDice()~~
     * Tim
 * ~~getCampus()~~
     * Carl

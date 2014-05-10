@@ -817,6 +817,75 @@ void makeAction (Game g, action a) {
 // the game starts in turn -1 (we call this state "Terra Nullis") and 
 // moves to turn 0 as soon as the first dice is thrown. 
 void throwDice (Game g, int diceScore) {
+   g->turnNumber++;
+   int X = 0;
+   int Y = 0;
+   int pCount = 0;
+   int add = 0
+
+   // Check the entire board for the hex with the equivalent diceScore
+   while (Y < GRID_HEIGHT){
+      X = 0;
+      while (X < GRID_WIDTH){
+         if (g->grid[X][Y]->diceNum == diceScore){
+            // make 3 passes, one for each player
+            pCount = 0;
+            while (pCount < 3){
+               add = 0
+               // Search adjacent vertexes and increment acccordingly
+               if (g->grid[X][Y]->vertices[0] == pCount + 1){
+                  add++;
+               }
+               if (g->grid[X][Y]->vertices[1] == pCount + 1){
+                  add++;
+               }
+               if (g->grid[X][Y]->vertices[1] == pCount + 1){
+                  add++;
+               }
+               if (g->grid[X][Y-1]->vertices[0] == pCount + 1){
+                  add++;
+               }
+               if (g->grid[X][Y-1]->vertices[1] == pCount + 1){
+                  add++;
+               }
+               if (g->grid[X-1][Y]->vertices[1] == pCount + 1){
+                  add++;
+               }
+               if (g->grid[X+1][Y-1]->vertices[0] == pCount + 1){
+                  add++;
+               }
+               if (g->grid[X][Y]->vertices[0] == pCount + 4){
+                  add+=2;
+               }
+               if (g->grid[X][Y]->vertices[1] == pCount + 4){
+                  add+=2;
+               }
+               if (g->grid[X][Y]->vertices[1] == pCount + 4){
+                  add+=2;
+               }
+               if (g->grid[X][Y-1]->vertices[0] == pCount + 4){
+                  add+=2;
+               }
+               if (g->grid[X][Y-1]->vertices[1] == pCount + 4){
+                  add+=2;
+               }
+               if (g->grid[X-1][Y]->vertices[1] == pCount + 4){
+                   add+=2;
+               }
+               if (g->grid[X+1][Y-1]->vertices[0] == pCount + 4){
+                  add+=2;
+               }
+
+               // Adds the accumulated students for that pass
+               g->studentAmounts[pCount][grid[X][Y]->resType] += add;
+               pCount++;
+            }//endwhile
+         }//endif
+         X++;
+      }//endwhile
+      Y++;
+   }//endwhile
+
     // advance the turn and distribute resources
 }
 
