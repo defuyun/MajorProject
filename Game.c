@@ -30,6 +30,12 @@
 #define DEFAULT_EXCHANGE_RATE 3
 #define OUTSIDE_BOARD -1
 
+#define CAMPUS_KPI 10
+#define GO8_KPI 20
+#define ARC_KPI 2
+#define IP_KPI 10
+#define PRESTIGE_BONUS 10
+
 
 
 // =====================================================================
@@ -732,57 +738,77 @@ void makeAction (Game g, action a) {
         playerArc = ARC_C;
     }
 
-    coord locate = pathToVertex(a.destination);
+    coord locateV = pathToVertex(a.destination);
+    coord locateA = pathToARC(a.destination);
 
     if(a.actionCode == BUILD_CAMPUS) {
-        g->grid[locate.x][locate.y].vertices[locate.vertNum]
+        g->grid[locateV.x][locateV.y].vertices[locateV.vertNum]
             = playerCampus;
         g->numCampuses[player-1]++;
-        g->numKPI[player-1] += 10;
+        g->studentAmounts[player-1][STUDENT_BPS]--;
+        g->studentAmounts[player-1][STUDENT_BQN]--;
+        g->studentAmounts[player-1][STUDENT_MJ]--;
+        g->studentAmounts[player-1][STUDENT_MTV]--;
+        g->numKPI[player-1] += CAMPUS_KPI;
     } else if (a.actionCode == BUILD_GO8) {
-        g->grid[locate.x][locate.y].vertices[locate.vertNum]
+        g->grid[locateV.x][locateV.y].vertices[locateV.vertNum]
             = playerGroupOfEight;
         g->numGO8s[player-1]++;
+        g->numCampuses[player-1]--;
+        g->studentAmounts[player-1][STUDENT_MJ] -= 2;
+        g->studentAmounts[player-1][STUDENT_MMONEY] -= 3;
 
         // total increase in KPI is 10 since we lose
         // one campus (10 KPI) to gain a GO8 (20 KPI)
-        g->numKPI[player-1] += 10;
+        g->numKPI[player-1] -= CAMPUS_KPI;
+        g->numKPI[player-1] += GO8_KPI;
     } else if (a.actionCode == OBTAIN_ARC) {
-        g->grid[locate.x][locate.y].arcs[locate.arcNum]
+        g->grid[locateA.x][locateA.y].arcs[locateA.arcNum]
             = playerArc;
         g->numARCs[player-1]++;
-        g->numKPI[player-1] += 2;
+        g->studentAmounts[player-1][STUDENT_BPS]--;
+        g->studentAmounts[player-1][STUDENT_BQN]--;
+        g->numKPI[player-1] += ARC_KPI;
+
+        // checks for prestige bonus regarding having most ARC grants
         if(g->numARCs[player-1] > g->uniWithMostARCs_number) {
-            g->numKPI[player-1] += 10;
-            if(getMostARCs(g) != NO_ONE
-                && getMostARCs(g) != player){
-                g->numKPI[getMostARCs(g)-1] -= 10;
+            if(getMostARCs(g) != NO_ONE &&
+               getMostARCs(g) != player){
+                g->numKPI[getMostARCs(g)-1] -= PRESTIGE_BONUS;
             }
+            g->numKPI[player-1] += PRESTIGE_BONUS;
+            g->uniWithMostARCs_number = g->numARCs[player-1];
+            g->uniWithMostARCs = player;
         }
     } else if (a.actionCode == OBTAIN_PUBLICATION) {
+        g->studentAmounts[player-1][STUDENT_MJ]--;
+        g->studentAmounts[player-1][STUDENT_MTV]--;
+        g->studentAmounts[player-1][STUDENT_MMONEY]--;
         g->numPubs[player-1]++;
+
+        // checks for prestige bonus regarding having most publications
         if(g->numPubs[player-1] > g->uniWithMostPubs_number) {
-            g->numKPI[player-1] += 10;
-            if(getMostPublications(g) != NO_ONE
-                && getMostPublications(g) != player){
-                g->numKPI[getMostPublications(g)-1] -= 10;
+            if(getMostPublications(g) != NO_ONE &&
+               getMostPublications(f) != player) {
+                g->numKPI[getMostPublications(g)-1] -= PRESTIGE_BONUS;
             }
+            g->numKPI[player-1] += PRESTIGE_BONUS;
+            g->uniWithMostPubs_number = g->numPubs[player-1];
+            g->uniWithMostPubs = player;
         }
     } else if (a.actionCode == OBTAIN_IP_PATENT) {
+        g->studentAmounts[player-1][STUDENT_MJ]--;
+        g->studentAmounts[player-1][STUDENT_MTV]--;
+        g->studentAmounts[player-1][STUDENT_MMONEY]--;
         g->numIPs[player-1]++;
-        g->numKPI[player-1] += 10;
+        g->numKPI[player-1] += IP_KPI;
     } else if (a.actionCode == RETRAIN_STUDENTS) {
         int exchangeRate = getExchangeRate(g, player-1,
             a.disciplineFrom, a.disciplineTo);
         g->studentAmounts[player-1][a.disciplineFrom] -= exchangeRate;
         g->studentAmounts[player-1][a.disciplineTo]++;
-    } else if (a.actionCode == PASS) {
-        int diceScore = (rand() % 6 + 1) + (rand() % 6 + 1);
-        throwDice(g, diceScore);
-    }
+    } 
 
-    // START_SPINOFF is not a legal action so
-    // it will not be included in this function
 }
 
 
@@ -1067,13 +1093,13 @@ int getExchangeRate (Game g, int player,
     int playerCampus;
     int playerGroupOfEight;
 
-    if(player == 1) {
+    if(player == UNI_A) {
         playerCampus = CAMPUS_A;
         playerGroupOfEight = GO8_A;
-    } else if (player == 2) {
+    } else if (player == UNI_B) {
         playerCampus = CAMPUS_B;
         playerGroupOfEight = GO8_B;
-    } else if (player == 3) {
+    } else if (player == UNI_C) {
         playerCampus = CAMPUS_C;
         playerGroupOfEight = GO8_C;
     }
