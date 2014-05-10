@@ -1035,7 +1035,7 @@ int getExchangeRate (Game g, int player,
                     if(playerCampus ==
                        g->grid[4][4].vertices[0] ||
                        playerCampus ==
-                       g->grid[4][4].vertices[1]
+                       g->grid[4][4].vertices[1] ||
                        playerGroupOfEight ==
                        g->grid[4][4].vertices[0] ||
                        playerGroupOfEight ==
@@ -1049,7 +1049,7 @@ int getExchangeRate (Game g, int player,
                     if(playerCampus ==
                        g->grid[6][1].vertices[0] ||
                        playerCampus ==
-                       g->grid[5][1].vertices[1]
+                       g->grid[5][1].vertices[1] ||
                        playerGroupOfEight ==
                        g->grid[6][1].vertices[0] ||
                        playerGroupOfEight ==
@@ -1063,7 +1063,7 @@ int getExchangeRate (Game g, int player,
                     if(playerCampus ==
                        g->grid[5][0].vertices[0] ||
                        playerCampus ==
-                       g->grid[4][0].vertices[1]
+                       g->grid[4][0].vertices[1] ||
                        playerGroupOfEight ==
                        g->grid[5][0].vertices[0] ||
                        playerGroupOfEight ==
@@ -1077,7 +1077,7 @@ int getExchangeRate (Game g, int player,
                     if(playerCampus ==
                        g->grid[1][2].vertices[1] ||
                        playerCampus ==
-                       g->grid[2][1].vertices[0]
+                       g->grid[2][1].vertices[0] ||
                        playerGroupOfEight ==
                        g->grid[1][2].vertices[1] ||
                        playerGroupOfEight ==
