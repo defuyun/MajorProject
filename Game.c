@@ -711,6 +711,78 @@ void makeAction (Game g, action a) {
     // perform the requested action `a'
     // update counters as required (e.g. uniWithMostPubs, numIPs, 
     // numKPI, studentAmounts etc)
+
+    int player = getWhoseTurn(g);
+
+    int playerCampus;
+    int playerGroupOfEight;
+    int playerArc;
+
+    if(player == 1) {
+        playerCampus = CAMPUS_A;
+        playerGroupOfEight = GO8_A;
+        playerArc = ARC_A;
+    } else if (player == 2) {
+        playerCampus = CAMPUS_B;
+        playerGroupOfEight = GO8_B;
+        playerArc = ARC_B;
+    } else if (player == 3) {
+        playerCampus = CAMPUS_C;
+        playerGroupOfEight = GO8_C;
+        playerArc = ARC_C;
+    }
+
+    coord locate = pathToVertex(a.destination);
+
+    if(a.actionCode == BUILD_CAMPUS) {
+        g->grid[locate.x][locate.y].vertices[locate.vertNum]
+            = playerCampus;
+        g->numCampuses[player-1]++;
+        g->numKPI[player-1] += 10;
+    } else if (a.actionCode == BUILD_GO8) {
+        g->grid[locate.x][locate.y].vertices[locate.vertNum]
+            = playerGroupOfEight;
+        g->numGO8s[player-1]++;
+
+        // total increase in KPI is 10 since we lose
+        // one campus (10 KPI) to gain a GO8 (20 KPI)
+        g->numKPI[player-1] += 10;
+    } else if (a.actionCode == OBTAIN_ARC) {
+        g->grid[locate.x][locate.y].arcs[locate.arcNum]
+            = playerArc;
+        g->numARCs[player-1]++;
+        g->numKPI[player-1] += 2;
+        if(g->numARCs[player-1] > g->uniWithMostARCs_number) {
+            g->numKPI[player-1] += 10;
+            if(getMostARCs(g) != NO_ONE
+                && getMostARCs(g) != player){
+                g->numKPI[getMostARCs(g)-1] -= 10;
+            }
+        }
+    } else if (a.actionCode == OBTAIN_PUBLICATION) {
+        g->numPubs[player-1]++;
+        if(g->numPubs[player-1] > g->uniWithMostPubs_number) {
+            g->numKPI[player-1] += 10;
+            if(getMostPublications(g) != NO_ONE
+                && getMostPublications(g) != player){
+                g->numKPI[getMostPublications(g)-1] -= 10;
+            }
+        }
+    } else if (a.actionCode == OBTAIN_IP_PATENT) {
+        g->numIPs[player-1]++;
+        g->numKPI[player-1] += 10;
+    } else if (a.actionCode == RETRAIN_STUDENTS) {
+        int exchangeRate = getExchangeRate(g, player-1,
+            a.disciplineFrom, a.disciplineTo);
+        g->studentAmounts[player-1][a.disciplineFrom] -= exchangeRate;
+        g->studentAmounts[player-1][a.disciplineTo]++;
+    } else if (a.actionCode == PASS) {
+        int diceScore = (rand() % 6 + 1) + (rand() % 6 + 1);
+        throwDice(g, diceScore);
+    }
+
+    // START_SPINOFF is not a legal action so
+    // it will not be included in this function
 }
 
 
