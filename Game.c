@@ -786,8 +786,8 @@ int getCampus(Game g, path inPath) {
 // return the contents of the given edge (ie ARC code or vacant ARC)
 int getARC(Game g, path pathToEdge) {
     //get the 2d coord of the path
-    coord vertex = pathToARC(pathToEdge);
-    return g->grid[vertex.x][vertex.y].vertices[vertex.arcNum];
+    coord arc = pathToARC(pathToEdge);
+    return g->grid[arc.x][arc.y].arcs[arc.arcNum];
 }
 
 
@@ -888,6 +888,35 @@ int isLegalAction (Game g, action a) {
         }
         */
     }
+    
+    if (a.actionCode == START_SPINOFF) {
+        int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
+        int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_MTV);
+        int resourceC = getStudents(g, getWhoseTurn(g), STUDENT_MMONEY);
+        //check if player has enough resource to start spinoff
+        if (resourceA < 1 || resourceB < 1 || resouceC < 1) {
+            isLegal = FALSE;
+        }
+    }
+    
+    if (a.actionCode == RETRAIN_STUDENTS) {
+        int resourceA = getStudents(g, getWhoseTurn(g), a.disciplineFrom);
+        int resourceB = getStudents(g, getWhoseTurn(g), a.disciplineTo);
+        
+        // check if the user entered a valid student type
+        if ((resourceA > 5 && resourceA < 1) 
+                || (resourceB > 5 && resourceB < 0)) {
+            isLegal = FALSE;
+        }
+        
+        // check for enough of the from student to retrain
+        if (getStudents(g, getWhoseTurn(g), a.disciplineFrom)
+                < getExchangeRate(g, getWhoseTurn(g), a.disciplineFrom,
+                    a.disciplineTo)) {
+            isLegal = FALSE;
+        }
+    }
+    
     return isLegal;
 }
 
@@ -963,6 +992,19 @@ int getExchangeRate (Game g, int player,
            (disciplineTo == STUDENT_MTV)  ||
            (disciplineTo == STUDENT_MMONEY));
 
+    int playerCampus;
+    int playerGroupOfEight;
+
+    if(player == 1) {
+        playerCampus = CAMPUS_A;
+        playerGroupOfEight = GO8_A;
+    } else if (player == 2) {
+        playerCampus = CAMPUS_B;
+        playerGroupOfEight = GO8_B;
+    } else if (player == 3) {
+        playerCampus = CAMPUS_C;
+        playerGroupOfEight = GO8_C;
+    }
     // by default, exchange rate is 3. If a player's campus lies
     // on a retraining centre, the exchange rate to retrain a
     // discipline (identical to the type of retraining centre)
@@ -976,9 +1018,13 @@ int getExchangeRate (Game g, int player,
         while(x < GRID_WIDTH) {
             while(z < NUM_VERTICES_PER_HEX){
                 if(disciplineFrom == STUDENT_MTV) {
-                    if(g->grid[x][y].vertices[z] == 
+                    if(playerCampus == 
                        g->grid[2][5].vertices[0] ||
-                       g->grid[x][y].vertices[z] ==
+                       playerCampus ==
+                       g->grid[2][5].vertices[1] ||
+                       playerGroupOfEight ==
+                       g->grid[2][5].vertices[0] ||
+                       playerGroupOfEight ==
                        g->grid[2][5].vertices[1]) {
                         exchangeRate = DISCOUNT_EXCHANGE_RATE;
                         x = GRID_WIDTH;
@@ -986,9 +1032,13 @@ int getExchangeRate (Game g, int player,
                         z = NUM_VERTICES_PER_HEX;                        
                     }
                 } else if(disciplineFrom == STUDENT_MMONEY) {
-                    if(g->grid[x][y].vertices[z] ==
+                    if(playerCampus ==
                        g->grid[4][4].vertices[0] ||
-                       g->grid[x][y].vertices[z] ==
+                       playerCampus ==
+                       g->grid[4][4].vertices[1]
+                       playerGroupOfEight ==
+                       g->grid[4][4].vertices[0] ||
+                       playerGroupOfEight ==
                        g->grid[4][4].vertices[1]) {
                         exchangeRate = DISCOUNT_EXCHANGE_RATE;
                         x = GRID_WIDTH;
@@ -996,9 +1046,13 @@ int getExchangeRate (Game g, int player,
                         z = NUM_VERTICES_PER_HEX; 
                     }
                 } else if(disciplineFrom == STUDENT_BQN) {
-                    if(g->grid[x][y].vertices[z] ==
+                    if(playerCampus ==
                        g->grid[6][1].vertices[0] ||
-                       g->grid[x][y].vertices[z] ==
+                       playerCampus ==
+                       g->grid[5][1].vertices[1]
+                       playerGroupOfEight ==
+                       g->grid[6][1].vertices[0] ||
+                       playerGroupOfEight ==
                        g->grid[5][1].vertices[1]) {
                         exchangeRate = DISCOUNT_EXCHANGE_RATE;
                         x = GRID_WIDTH;
@@ -1006,9 +1060,13 @@ int getExchangeRate (Game g, int player,
                         z = NUM_VERTICES_PER_HEX; 
                     }
                 } else if(disciplineFrom == STUDENT_MJ) {
-                    if(g->grid[x][y].vertices[z] ==
+                    if(playerCampus ==
                        g->grid[5][0].vertices[0] ||
-                       g->grid[x][y].vertices[z] ==
+                       playerCampus ==
+                       g->grid[4][0].vertices[1]
+                       playerGroupOfEight ==
+                       g->grid[5][0].vertices[0] ||
+                       playerGroupOfEight ==
                        g->grid[4][0].vertices[1]) {
                         exchangeRate = DISCOUNT_EXCHANGE_RATE;
                         x = GRID_WIDTH;
@@ -1016,9 +1074,13 @@ int getExchangeRate (Game g, int player,
                         z = NUM_VERTICES_PER_HEX; 
                     }
                 } else if(disciplineFrom == STUDENT_BPS) {
-                    if(g->grid[x][y].vertices[z] ==
+                    if(playerCampus ==
                        g->grid[1][2].vertices[1] ||
-                       g->grid[x][y].vertices[z] ==
+                       playerCampus ==
+                       g->grid[2][1].vertices[0]
+                       playerGroupOfEight ==
+                       g->grid[1][2].vertices[1] ||
+                       playerGroupOfEight ==
                        g->grid[2][1].vertices[0]) {
                         exchangeRate = DISCOUNT_EXCHANGE_RATE;
                         x = GRID_WIDTH;
