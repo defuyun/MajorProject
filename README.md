@@ -11,7 +11,7 @@ As you write static functions, add them to the unit tests file!
 List of things to do:
 * ~~newGame()~~
     * James
-* makeAction()
+* ~~makeAction()~~
     * Matt
 * throwDice()
     * Tim
@@ -21,7 +21,7 @@ List of things to do:
     * Carl
 * isLegalAction()
     * Mostly James, since he has less functions than other people
-* getExchangeRate()
+* ~~getExchangeRate()~~
     * Matt
 * ~~pathToARC~~
     * Carl
