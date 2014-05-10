@@ -903,15 +903,17 @@ int isLegalAction (Game g, action a) {
         int resourceA = getStudents(g, getWhoseTurn(g), a.disciplineFrom);
         int resourceB = getStudents(g, getWhoseTurn(g), a.disciplineTo);
         
-        //check if the user entered a valid student type
+        // check if the user entered a valid student type
         if ((resourceA > 5 && resourceA < 1) 
                 || (resourceB > 5 && resourceB < 0)) {
             isLegal = FALSE;
         }
         
-        //can't retrain when player has less than 2 student
-        if (resourceA < 2) {
-            isLegal = FALSE
+        // check for enough of the from student to retrain
+        if (getStudents(g, getWhoseTurn(g), a.disciplineFrom)
+                < getExchangeRate(g, getWhoseTurn(g), a.disciplineFrom,
+                    a.disciplineTo)) {
+            isLegal = FALSE;
         }
     }
     
