@@ -156,8 +156,8 @@ static int isPathContained(path inPath);
 // destination vertex to ensure there are arcs adjacent. When building 
 // an ARC, call isARCConnected on the destination edge to ensure an
 // ARC or campus is adjacent
-static int isARCConnected(path inPath, int player);
-static int isCampusConnected(path inPath, int player);
+static int isARCConnected(path inPath, Game g, int player);
+static int isCampusConnected(path inPath, Game g, int player);
 
 // returns true if there are campuses next to the vertex at inPath
 static int isCampusTooClose(Game g, path inPath);
@@ -619,16 +619,16 @@ static int isARCConnected(path inPath, Game g, int player){
    strcat(v1, "B");
    strcpy(v0, inPath);
 
-   if (getARC(pL) == player || getARC(pR) == player
-       || getARC(pBL) == player || getARC(pBR) == player
-       || getCampus(v0) == player || getCampus(v1) == player}
+   if (getARC(g,pL) == player || getARC(g,pR) == player
+       || getARC(g,pBL) == player || getARC(g,pBR) == player
+       || getCampus(g,v0) == player || getCampus(g,v1) == player}
       connected = 1;
    }
    return connected;
 }
 
 
-static int isCampusConnected(path inPath, int player){
+static int isCampusConnected(path inPath, Game g, int player){
    int connected = 0;
    path pL,pR
    strcpy(pL, inPath);
@@ -636,8 +636,8 @@ static int isCampusConnected(path inPath, int player){
    strcpy(pR, inPath);
    strcat(pR, "R");
 
-   if (getARC(pL) == player || getARC(pR) == player
-       || getARC(inPath) == player}
+   if (getARC(g,pL) == player || getARC(g,pR) == player
+       || getARC(g,inPath) == player}
       connected = 1;
    }
    return connected;
