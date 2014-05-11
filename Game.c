@@ -791,7 +791,7 @@ void makeAction (Game g, action a) {
         g->numIPs[player-1]++;
         g->numKPI[player-1] += IP_KPI;
     } else if (a.actionCode == RETRAIN_STUDENTS) {
-        int exchangeRate = getExchangeRate(g, player-1,
+        int exchangeRate = getExchangeRate(g, player,
             a.disciplineFrom, a.disciplineTo);
         g->studentAmounts[player-1][a.disciplineFrom] -= exchangeRate;
         g->studentAmounts[player-1][a.disciplineTo]++;
