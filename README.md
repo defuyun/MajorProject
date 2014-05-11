@@ -27,8 +27,8 @@ List of things to do:
     * Carl
 * ~~pathToVertex~~
     * Carl
-* isARCConnected
+* ~~isARCConnected~~
     * Tim
-* isCampusConnected
+* ~~isCampusConnected~~
     * Tim
 
