@@ -621,7 +621,7 @@ static int isARCConnected(path inPath, Game g, int player){
 
    if (getARC(g,pL) == player || getARC(g,pR) == player
        || getARC(g,pBL) == player || getARC(g,pBR) == player
-       || getCampus(g,v0) == player || getCampus(g,v1) == player}
+       || getCampus(g,v0) == player || getCampus(g,v1) == player) {
       connected = 1;
    }
    return connected;
@@ -630,14 +630,15 @@ static int isARCConnected(path inPath, Game g, int player){
 
 static int isCampusConnected(path inPath, Game g, int player){
    int connected = 0;
-   path pL,pR
+   path pL;
+   path pR;
    strcpy(pL, inPath);
    strcat(pL, "L");
    strcpy(pR, inPath);
    strcat(pR, "R");
 
    if (getARC(g,pL) == player || getARC(g,pR) == player
-       || getARC(g,inPath) == player}
+       || getARC(g,inPath) == player) {
       connected = 1;
    }
    return connected;
@@ -778,7 +779,7 @@ void makeAction (Game g, action a) {
         playerCampus = CAMPUS_B;
         playerGroupOfEight = GO8_B;
         playerArc = ARC_B;
-    } else if (player == 3) {
+    } else {
         playerCampus = CAMPUS_C;
         playerGroupOfEight = GO8_C;
         playerArc = ARC_C;
@@ -835,7 +836,7 @@ void makeAction (Game g, action a) {
         // checks for prestige bonus regarding having most publications
         if(g->numPubs[player-1] > g->uniWithMostPubs_number) {
             if(getMostPublications(g) != NO_ONE &&
-               getMostPublications(f) != player) {
+               getMostPublications(g) != player) {
                 g->numKPI[getMostPublications(g)-1] -= PRESTIGE_BONUS;
             }
             g->numKPI[player-1] += PRESTIGE_BONUS;
@@ -867,63 +868,63 @@ void throwDice (Game g, int diceScore) {
    int X = 0;
    int Y = 0;
    int pCount = 0;
-   int add = 0
+   int add = 0;
 
    // Check the entire board for the hex with the equivalent diceScore
    while (Y < GRID_HEIGHT){
       X = 0;
       while (X < GRID_WIDTH){
-         if (g->grid[X][Y]->diceNum == diceScore){
+         if (g->grid[X][Y].diceNum == diceScore){
             // make 3 passes, one for each player
             pCount = 0;
             while (pCount < 3){
-               add = 0
+               add = 0;
                // Search adjacent vertexes and increment acccordingly
-               if (g->grid[X][Y]->vertices[0] == pCount + 1){
+               if (g->grid[X][Y].vertices[0] == pCount + 1){
                   add++;
                }
-               if (g->grid[X][Y]->vertices[1] == pCount + 1){
+               if (g->grid[X][Y].vertices[1] == pCount + 1){
                   add++;
                }
-               if (g->grid[X][Y]->vertices[1] == pCount + 1){
+               if (g->grid[X][Y].vertices[1] == pCount + 1){
                   add++;
                }
-               if (g->grid[X][Y-1]->vertices[0] == pCount + 1){
+               if (g->grid[X][Y-1].vertices[0] == pCount + 1){
                   add++;
                }
-               if (g->grid[X][Y-1]->vertices[1] == pCount + 1){
+               if (g->grid[X][Y-1].vertices[1] == pCount + 1){
                   add++;
                }
-               if (g->grid[X-1][Y]->vertices[1] == pCount + 1){
+               if (g->grid[X-1][Y].vertices[1] == pCount + 1){
                   add++;
                }
-               if (g->grid[X+1][Y-1]->vertices[0] == pCount + 1){
+               if (g->grid[X+1][Y-1].vertices[0] == pCount + 1){
                   add++;
                }
-               if (g->grid[X][Y]->vertices[0] == pCount + 4){
+               if (g->grid[X][Y].vertices[0] == pCount + 4){
                   add+=2;
                }
-               if (g->grid[X][Y]->vertices[1] == pCount + 4){
+               if (g->grid[X][Y].vertices[1] == pCount + 4){
                   add+=2;
                }
-               if (g->grid[X][Y]->vertices[1] == pCount + 4){
+               if (g->grid[X][Y].vertices[1] == pCount + 4){
                   add+=2;
                }
-               if (g->grid[X][Y-1]->vertices[0] == pCount + 4){
+               if (g->grid[X][Y-1].vertices[0] == pCount + 4){
                   add+=2;
                }
-               if (g->grid[X][Y-1]->vertices[1] == pCount + 4){
+               if (g->grid[X][Y-1].vertices[1] == pCount + 4){
                   add+=2;
                }
-               if (g->grid[X-1][Y]->vertices[1] == pCount + 4){
+               if (g->grid[X-1][Y].vertices[1] == pCount + 4){
                    add+=2;
                }
-               if (g->grid[X+1][Y-1]->vertices[0] == pCount + 4){
+               if (g->grid[X+1][Y-1].vertices[0] == pCount + 4){
                   add+=2;
                }
 
                // Adds the accumulated students for that pass
-               g->studentAmounts[pCount][grid[X][Y]->resType] += add;
+               g->studentAmounts[pCount][g->grid[X][Y].resType] += add;
                pCount++;
             }//endwhile
          }//endif
@@ -1051,7 +1052,7 @@ int isLegalAction (Game g, action a) {
         }
 
         // check the campus is connected to one of the player's ARCs
-        if (isCampusConnected(a.destination, getWhoseTurn(g)) 
+        if (isCampusConnected(a.destination, g, getWhoseTurn(g)) 
                 == FALSE) {
             isLegal = FALSE;
         }
@@ -1094,7 +1095,7 @@ int isLegalAction (Game g, action a) {
         }
 
         // check the player has connected arcs/campuses
-        if (isARCConnected(a.destination, getWhoseTurn(g)) == FALSE) {
+        if (isARCConnected(a.destination, g, getWhoseTurn(g)) == FALSE) {
             isLegal = FALSE;
         }
     }
@@ -1105,7 +1106,7 @@ int isLegalAction (Game g, action a) {
         int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
         int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_MTV);
         int resourceC = getStudents(g, getWhoseTurn(g), STUDENT_MMONEY);
-        if (resourceA < 1 || resourceB < 1 || resouceC < 1) {
+        if (resourceA < 1 || resourceB < 1 || resourceC < 1) {
             isLegal = FALSE;
         }
     }
@@ -1208,13 +1209,13 @@ int getExchangeRate (Game g, int player,
     int playerCampus;
     int playerGroupOfEight;
 
-    if(player == UNI_A) {
+    if (player == UNI_A) {
         playerCampus = CAMPUS_A;
         playerGroupOfEight = GO8_A;
     } else if (player == UNI_B) {
         playerCampus = CAMPUS_B;
         playerGroupOfEight = GO8_B;
-    } else if (player == UNI_C) {
+    } else {
         playerCampus = CAMPUS_C;
         playerGroupOfEight = GO8_C;
     }
