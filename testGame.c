@@ -125,15 +125,15 @@ void beginTesting(void) {
     testGetWhoseTurn();
     testGetCampus();
     testGetARC();
-    testIsLegalAction();
     testGetKPIpoints();
     testGetARCs();
     testGetGO8s();
     testGetCampuses();
     testGetIPs();
     testGetPublications();
-    testGetStudents();
     testGetExchangeRate();
+    testIsLegalAction();
+    testGetStudents();
 
     puts("Congrats, testing found no errors!");
 }
@@ -669,7 +669,7 @@ void testIsLegalAction(void) {
     action e = {.actionCode = 4};
     action f = {.actionCode = 5};
     action gAction = {.actionCode = 6};
-    action h = {.actionCode = 7};
+    action h = {.actionCode = 7, .disciplineFrom = STUDENT_BPS};
     assert(isLegalAction(g, a) == FALSE);
     assert(isLegalAction(g, b) == FALSE);
     assert(isLegalAction(g, c) == FALSE);
@@ -679,27 +679,9 @@ void testIsLegalAction(void) {
     assert(isLegalAction(g, gAction) == FALSE);
     assert(isLegalAction(g, h) == FALSE);
 
-    // TEST 2: integers other than action codes are illegal
-    throwDice(g, 2);
-    action i = {.actionCode = -1};
-    action j = {.actionCode = -2};
-    action k = {.actionCode = -3};
-    action l = {.actionCode = 8};
-    action m = {.actionCode = 9};
-    action n = {.actionCode = 10};
-    action o = {.actionCode = 11};
-    action p = {.actionCode = 12};
-    assert(isLegalAction(g, i) == FALSE);
-    assert(isLegalAction(g, j) == FALSE);
-    assert(isLegalAction(g, k) == FALSE);
-    assert(isLegalAction(g, l) == FALSE);
-    assert(isLegalAction(g, m) == FALSE);
-    assert(isLegalAction(g, n) == FALSE);
-    assert(isLegalAction(g, o) == FALSE);
-    assert(isLegalAction(g, p) == FALSE);
-
     // TEST 3: if we don't have enough students, the actions are illegal
     // we begin the game with 3 BPS, 3 BQN, 1 MTV, 1 MJ, 1 M$
+    throwDice(g, 2);
     action q = {.actionCode = OBTAIN_ARC, .destination="R"};
     assert(isLegalAction(g, q) == TRUE);
     makeAction(g, q);
@@ -1295,8 +1277,6 @@ void testGetExchangeRate(void) {
     runGame(g);
 
     //TEST 1: exchanging STUDENT_BPS to other disciples
-    
-
     assert(getExchangeRate(g, UNI_A, STUDENT_BPS, STUDENT_MTV) == 3);
     assert(getExchangeRate(g, UNI_A, STUDENT_BPS, STUDENT_BQN) == 3);
     assert(getExchangeRate(g, UNI_A, STUDENT_BPS, STUDENT_MJ) == 3);

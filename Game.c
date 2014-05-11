@@ -216,226 +216,148 @@ static int coordToRegID(coord inCoord) {
     return newRegID;
 }
 
-//returns the coordinate and the corresponding vertex of a given path
-//JAMES & TIM, I decided to use the 3 direction model because it seems 
-// like I'm always missing something with the 6 direction one.
+// return the coordinate of a path at the end of the vertex
 static coord pathToVertex(path inPath) {
-    // set a counter to determine which step
-    int count = 0;
-    coord initialCoord = {.x = 3,.y = 5,.arcNum = -1,.vertNum = 0};   
-    // each vertex (0,1) can have 3 directions, 
-    // each direction has 3 paths (L,B,R)
-    int direct = 2;
-    
-    // basically there are 2*3*3 possible ways of moving along the board
-    // for each vertex(0 or 1), there are 3 directions it can take, and 
-    // for each direction there are "L" "R" or "B" ways of moving. 
-    // depending on the direction, each move produces a different effect
-    
-    // for vertex 0
-    // direct 0 contains: left-up == left, left-down == right
-    // direct 1 contains: right == right, left-upward == left
-    // direct 2 contains: right == left, left-down == right
-    
-    // vertex 1 is the opposite of vertex 2 in terms of left and right 
-    // e.g. direct 0 contains: right-up == left, right-down == right
-    
-    while (inPath[count] != '\0') {
-        // vertex 0
-        if (!initialCoord.vertNum) {
-            initialCoord.vertNum = 1;
-            if (direct == 0) {
-                initialCoord.x -= 1;
-                if (inPath[count] == 'L') {
-                    direct = 2;
-                } else if (inPath[count] == 'R') {
-                    initialCoord.y += 1;
-                    direct = 1;
-                } else if (inPath[count] == 'B') {
-                    initialCoord.x += 1;
-                    direct = 0;
-                }
-            } else if (direct == 1) {
-                if (inPath[count]  == 'L') {
-                    initialCoord.x -= 1;
-                    initialCoord.y += 1;
-                    direct = 1;
-                } else if (inPath[count]  == 'R') {
-                    direct = 0;
-                } else if (inPath[count]  == 'B') {
-                    initialCoord.x -= 1;
-                    direct = 2;
-                }
-            } else if (direct == 2) {
-                initialCoord.vertNum = 1;
-                if (inPath[count]  == 'L')  {
-                    direct = 0;
-                } else if (inPath[count]  == 'R') {
-                    initialCoord.x -= 1;
-                    direct = 2;
-                } else if (inPath[count]  == 'B') {
-                    initialCoord.x -= 1;
-                    initialCoord.y += 1;
-                    direct = 1;
-                }
-            }
-            count++;
-        } else if(initialCoord.vertNum == 1) {
-            // vertex 1
-            initialCoord.vertNum = 0;
-            if (direct == 0) {
-                initialCoord.x += 1;
-                if (inPath[count] == 'L') {
-                    direct = 1;
-                } else if (inPath[count]  == 'R') {
-                    initialCoord.y -= 1;
-                    direct = 2;
-                } else if (inPath[count]  == 'B') {
-                    initialCoord.x -= 1;
-                    direct = 0;
-                }
-            } else if (direct == 1) {
-                if (inPath[count]  == 'L') {
-                    direct = 0;
-                } else if (inPath[count]  == 'R') {
-                    initialCoord.x += 1;
-                    direct = 1;
-                } else if (inPath[count]  == 'B') {
-                    initialCoord.x += 1;
-                    initialCoord.y -= 1;
-                    direct = 2;
-                }
-            } else if (direct == 2) {
-                if (inPath[count] == 'L') {
-                    initialCoord.x += 1;
-                    initialCoord.y -= 1;
-                    direct = 2;
-                } else if (inPath[count] == 'R') {
-                    direct = 0;
-                } else if (inPath[count]  == 'B') {
-                    initialCoord.x += 1;
-                    direct = 1;
-                }
-            }
-            count++;
+    // there are six directions we could be facing, call them 0..5
+    // turning RIGHT adds 1 to the direction, mod 6
+    // turning LEFT subtracts 1 off the direction, mod 6
+
+    // start at the initial position above the grid
+    coord finalCoord = {.x = 2, .y = 6};
+
+    int i = 0;
+    // preDirection is the direction [0..5] we face before the turn
+    int preDirection = 0;
+    while (inPath[i] != 0) {
+        char turn = inPath[i];
+        // postDirection is the direction [0..5] we face after the turn
+        int postDirection;
+        if (turn == 'L') {
+            postDirection = (preDirection - 1) % 6;
+        } else if (turn == 'R') {
+            postDirection = (preDirection + 1) % 6;
+        } else {
+            postDirection = (preDirection + 3) % 6;
         }
+        postDirection %= 6;
+        if (postDirection < 0) {
+            postDirection += 6;
+        }
+
+        if (postDirection == 1 && preDirection == 0) {
+            finalCoord.x++;
+            finalCoord.y--;
+        } else if (postDirection == 2 && preDirection == 1) {
+            finalCoord.x--;
+        } else if (postDirection == 3 && preDirection == 2) {
+            finalCoord.x--;
+            finalCoord.y++;
+        } else if (postDirection == 4 && preDirection == 3) {
+            finalCoord.x++;
+        } else if (postDirection == 5 && preDirection == 0) {
+            finalCoord.x++;
+            finalCoord.y--;
+        } else if (postDirection == 4 && preDirection == 5) {
+            finalCoord.x++;
+        } else if (postDirection == 3 && preDirection == 4) {
+            finalCoord.x--;
+            finalCoord.y++;
+        } else if (postDirection == 0 && preDirection == 1) {
+            finalCoord.x--;
+        } else {
+            // Do nothing
+        }
+
+        // update the direction we face
+        preDirection = postDirection;
+        i++;
     }
-    return initialCoord;
+
+    // alter the coordinates so we can store the vertex on the end
+    if (preDirection == 0) {
+        finalCoord.x++;
+        finalCoord.y--;
+        finalCoord.vertNum = 0;
+    } else if (preDirection == 1) {
+        finalCoord.x--;
+        finalCoord.vertNum = 1;
+    } else if (preDirection == 2) {
+        finalCoord.vertNum = 0;
+    } else if (preDirection == 3) {
+        finalCoord.vertNum = 1;
+    } else if (preDirection == 4) {
+        finalCoord.vertNum = 0;
+    } else {
+        finalCoord.vertNum = 1;
+    }
+    finalCoord.arcNum = -1;
+
+    return finalCoord;
 }
 
+// return the coordinate of the arc at the end of a path
 static coord pathToARC(path inPath) {
-    int count = 0;
-    coord initialCoord = { .x = 3, .y = 5, .arcNum = -1, .vertNum = 0 };
-    // vertNum set to 0 or 1 to determine which vertex currently on, 
-    // doesn't matter what coordinate
-    // arcNum set to -1 because initially there is no arc, 
-    // so it returns -1 if player didn't enter a path
+    // there are six directions we could be facing, call them 0..5
+    // turning RIGHT adds 1 to the direction, mod 6
+    // turning LEFT subtracts 1 off the direction, mod 6
 
-    int direct = 2; //three directions 0,1,2 
-    
-    while (inPath[count]!='\0') {
-         if (!initialCoord.vertNum) {
-            initialCoord.vertNum = 1;
-            if (direct == 0) {
-                if (inPath[count] == 'L') {
-                    initialCoord.arcNum = 0;
-                    direct = 2;
-                } else if (inPath[count] == 'R') {
-                    initialCoord.x -= 1;
-                    initialCoord.y += 1;
-                    initialCoord.arcNum = 2;
-                    direct = 1;
-                } else if (inPath[count] == 'B') {
-                    direct = 0;
-                    initialCoord.arcNum = 1;
-                }
-            } else if (direct == 1) {
-                if (inPath[count] == 'L') {
-                    initialCoord.x -= 1;
-                    initialCoord.y += 1;
-                    initialCoord.arcNum = 2;
-                    direct = 1;
-                } else if (inPath[count] == 'R') {
-                    direct = 0;
-                    initialCoord.arcNum = 1;
-                } else if (inPath[count] == 'B') {
-                    direct = 2;
-                    initialCoord.arcNum = 0;
-                }
-            } else if (direct == 2) {
-                // for direct 2, it assumes that the path is comming 
-                // from left-up position (which is probably the only 
-                // path) so it needs to adjust it's coordinate e.g 
-                // starting from Arc 3 of coord 2,5 it must change to 
-                // coord 3,4 no matter what step is taken 
-                // (excluding back)
-                initialCoord.vertNum = 1;
-                //initially, no path leads to the starting point
-                // so we can't assume there is a path, therefore the 
-                // coord must remain unchanged
-                if (!(initialCoord.x == 3 && initialCoord.y == 5)) { 
-                    initialCoord.x += 1;
-                    initialCoord.y -= 1;
-                }if (inPath[count] == 'L') {
-                    direct = 0;
-                    initialCoord.arcNum = 1;
-                } else if (inPath[count] == 'R') {
-                    direct = 2;
-                    initialCoord.arcNum = 0;
-                } else if (inPath[count] == 'B') {
-                    initialCoord.x -= 1;
-                    initialCoord.y += 1;
-                    direct = 1;
-                    initialCoord.arcNum = 2;
-                }
-            }
-            count++;
-         } else if(initialCoord.vertNum == 1) {
-            initialCoord.vertNum = 0;
-            if (direct == 0) {
-                if (inPath[count] == 'L') {
-                    initialCoord.x += 1;
-                    direct = 1;
-                    initialCoord.arcNum = 0;
-                } else if (inPath[count] == 'R') {
-                    initialCoord.arcNum = 2;
-                    direct = 2;
-                } else if (inPath[count] == 'B') {
-                    initialCoord.arcNum = 1;
-                    direct = 0;
-                }
-            } else if (direct == 1) {
-                if (inPath[count] == 'L') {
-                    direct = 0;
-                    initialCoord.arcNum = 1;
-                } else if (inPath[count] == 'R') {
-                    initialCoord.x += 1;
-                    direct = 1;
-                    initialCoord.arcNum = 0;
-                } else if (inPath[count] == 'B') {
-                    direct = 2;
-                    initialCoord.arcNum = 2;
-                }
-            } else if (direct == 2) {
-                //coord adjustment assuming path from right up.
-                initialCoord.x -= 1; 
-                if (inPath[count] == 'L') {
-                    direct = 2;
-                    initialCoord.arcNum = 2;
-                } else if (inPath[count] == 'R') {
-                    direct = 0;
-                    initialCoord.arcNum = 1;
-                } else if (inPath[count] == 'B') {
-                    initialCoord.x += 1;
-                    direct = 1;
-                    initialCoord.arcNum = 0;
-                }
-            }
-            count++;
+    // start at the initial position above the grid
+    coord finalCoord = {.x = 2, .y = 6};
+
+    int i = 0;
+    // preDirection is the direction [0..5] we face before the turn
+    int preDirection = 0;
+    while (inPath[i] != 0) {
+        char turn = inPath[i];
+        // postDirection is the direction [0..5] we face after the turn
+        int postDirection;
+        if (turn == 'L') {
+            postDirection = (preDirection - 1) % 6;
+        } else if (turn == 'R') {
+            postDirection = (preDirection + 1) % 6;
+        } else {
+            postDirection = (preDirection + 3) % 6;
         }
+        postDirection %= 6;
+        if (postDirection < 0) {
+            postDirection += 6;
+        }
+
+        if (postDirection == 1 && preDirection == 0) {
+            finalCoord.x++;
+            finalCoord.y--;
+        } else if (postDirection == 2 && preDirection == 1) {
+            finalCoord.x--;
+        } else if (postDirection == 3 && preDirection == 2) {
+            finalCoord.x--;
+            finalCoord.y++;
+        } else if (postDirection == 4 && preDirection == 3) {
+            finalCoord.x++;
+        } else if (postDirection == 5 && preDirection == 0) {
+            finalCoord.x++;
+            finalCoord.y--;
+        } else if (postDirection == 4 && preDirection == 5) {
+            finalCoord.x++;
+        } else if (postDirection == 3 && preDirection == 4) {
+            finalCoord.x--;
+            finalCoord.y++;
+        } else if (postDirection == 0 && preDirection == 1) {
+            finalCoord.x--;
+        } 
+
+        // update the direction we face
+        preDirection = postDirection;
+        i++;
     }
-    initialCoord.vertNum = -1;
-    return initialCoord;
+
+    // return which arc is needed to hold our position in the hex
+    finalCoord.arcNum = (preDirection % 3) - 1;
+    if (finalCoord.arcNum < 0) {
+        finalCoord.arcNum += 3;
+    }
+    finalCoord.vertNum = -1;
+
+    return finalCoord;
 }
 
 // Move an imaginary point along the path. If at any time the point 
@@ -548,56 +470,71 @@ static int isCampusTooClose(Game g, path inPath) {
 static int isCoordInside(coord c) {
     int isInside = FALSE;
     
-    // if we are clearly inside the board
-    if (c.x == 1 && c.y > 2 && c.y < 6) {
-        isInside = TRUE;
-    } else if (c.x == 2 && c.y > 1 && c.y < 6) {
-        isInside = TRUE;
-    } else if (c.x == 3 && c.y > 0 && c.y < 6) {
-        isInside = TRUE;
-    } else if (c.x == 4 && c.y > 0 && c.y < 5) {
-        isInside = TRUE;
-    } else if (c.x == 5 && c.y > 0 && c.y < 4) {
-        isInside = TRUE;
-    }
+    // if we are only looking at the hex itself, not its arcs/vertices
+    if (c.vertNum == c.arcNum && c.vertNum == -1) {
+        if (c.x == 1 && c.y > 2 && c.y < 6) {
+            isInside = TRUE;
+        } else if (c.x == 2 && c.y > 1 && c.y < 6) {
+            isInside = TRUE;
+        } else if (c.x == 3 && c.y > 0 && c.y < 6) {
+            isInside = TRUE;
+        } else if (c.x == 4 && c.y > 0 && c.y < 5) {
+            isInside = TRUE;
+        } else if (c.x == 5 && c.y > 0 && c.y < 4) {
+            isInside = TRUE;
+        }
+    } else {
+        // if we are clearly inside the board
+        if (c.x == 1 && c.y > 2 && c.y < 6) {
+            isInside = TRUE;
+        } else if (c.x == 2 && c.y > 1 && c.y < 6) {
+            isInside = TRUE;
+        } else if (c.x == 3 && c.y > 0 && c.y < 6) {
+            isInside = TRUE;
+        } else if (c.x == 4 && c.y > 0 && c.y < 5) {
+            isInside = TRUE;
+        } else if (c.x == 5 && c.y > 0 && c.y < 4) {
+            isInside = TRUE;
+        }
 
-    // if we are on the left edge of the board, hex is outside
-    if (c.x == 0 && c.y > 2 && c.y < 6 
-            && (c.arcNum == 2 || c.vertNum == 1)) {
-        isInside = TRUE;
-    }
+        // if we are on the left edge of the board, hex is outside
+        if (c.x == 0 && c.y > 2 && c.y < 6 
+                && (c.arcNum == 2 || c.vertNum == 1)) {
+            isInside = TRUE;
+        }
 
-    // if we are on the right edge of the board, hex is outside
-    if (c.x == 6 && c.y > -1 && c.y < 3 
-            && (c.arcNum == 0 || c.vertNum == 0)) {
-        isInside = TRUE;
-    }
+        // if we are on the right edge of the board, hex is outside
+        if (c.x == 6 && c.y > -1 && c.y < 3 
+                && (c.arcNum == 0 || c.vertNum == 0)) {
+            isInside = TRUE;
+        }
 
-    // if we are on the right edge of the board, hex is outside
-    if (c.x == 6 && c.y > -1 && c.y < 3 
-            && (c.arcNum == 0 || c.vertNum == 0)) {
-        isInside = TRUE;
-    }
+        // if we are on the right edge of the board, hex is outside
+        if (c.x == 6 && c.y > -1 && c.y < 3 
+                && (c.arcNum == 0 || c.vertNum == 0)) {
+            isInside = TRUE;
+        }
 
-    // if we are on the bottom right edge of the board, hex is outside
-    if (c.y == 0 && c.x > 2 && c.y < 6) {
-        if (c.x == 3) {
-            if (c.arcNum == 1 || c.vertNum == 0 || c.vertNum == 1) {
-                isInside = TRUE;
-            }
-        } else {
-            if (c.arcNum == 0 || c.arcNum == 1 || c.vertNum == 0 
-                    || c.vertNum == 1) {
-                isInside = TRUE;
+        // if we are on the bottom right edge of the board, hex is outside
+        if (c.y == 0 && c.x > 2 && c.y < 6) {
+            if (c.x == 3) {
+                if (c.arcNum == 1 || c.vertNum == 0 || c.vertNum == 1) {
+                    isInside = TRUE;
+                }
+            } else {
+                if (c.arcNum == 0 || c.arcNum == 1 || c.vertNum == 0 
+                        || c.vertNum == 1) {
+                    isInside = TRUE;
+                }
             }
         }
-    }
 
-    // if we are on the bottom left edge of the board, hex is outside
-    if (c.x + c.y == 3 && c.x < 3 && c.x > 0
-            && (c.arcNum == 1 || c.arcNum == 2 || c.vertNum == 0 
-                || c.vertNum == 1)) {
-        isInside = TRUE;
+        // if we are on the bottom left edge of the board, hex is outside
+        if (c.x + c.y == 3 && c.x < 3 && c.x > 0
+                && (c.arcNum == 1 || c.arcNum == 2 || c.vertNum == 0 
+                    || c.vertNum == 1)) {
+            isInside = TRUE;
+        }
     }
 
     return isInside;
@@ -692,7 +629,8 @@ Game newGame (int discipline[], int dice[]) {
     // create the hex layout's disciplines and dice
     while (row < GRID_HEIGHT) {
         while (column < GRID_WIDTH) {
-            coord currentCoord = {.x = column, .y = row};
+            coord currentCoord = {.x = column, .y = row, .arcNum = -1, 
+                .vertNum = -1};
             if (isCoordInside(currentCoord)) {
                 g->grid[column][row].resType 
                     = discipline[coordToRegID(currentCoord)];
@@ -818,6 +756,9 @@ void makeAction (Game g, action a) {
         g->numKPI[player-1] += ARC_KPI;
 
         // checks for prestige bonus regarding having most ARC grants
+        if (g->uniWithMostARCs == player) {
+            g->uniWithMostARCs_number++;
+        }
         if(g->numARCs[player-1] > g->uniWithMostARCs_number) {
             if(getMostARCs(g) != NO_ONE &&
                getMostARCs(g) != player){
@@ -886,9 +827,6 @@ void throwDice (Game g, int diceScore) {
                if (g->grid[X][Y].vertices[1] == pCount + 1){
                   add++;
                }
-               if (g->grid[X][Y].vertices[1] == pCount + 1){
-                  add++;
-               }
                if (g->grid[X][Y-1].vertices[0] == pCount + 1){
                   add++;
                }
@@ -902,9 +840,6 @@ void throwDice (Game g, int diceScore) {
                   add++;
                }
                if (g->grid[X][Y].vertices[0] == pCount + 4){
-                  add+=2;
-               }
-               if (g->grid[X][Y].vertices[1] == pCount + 4){
                   add+=2;
                }
                if (g->grid[X][Y].vertices[1] == pCount + 4){
@@ -933,7 +868,17 @@ void throwDice (Game g, int diceScore) {
       Y++;
    }//endwhile
 
-    // advance the turn and distribute resources
+   if (diceScore == 7) {
+      int player = 0;
+      while (player < NUM_UNIS) {
+         g->studentAmounts[player][STUDENT_THD] = 
+            g->studentAmounts[player][STUDENT_MTV]
+               + g->studentAmounts[player][STUDENT_MMONEY];
+         g->studentAmounts[player][STUDENT_MTV] = 0;
+         g->studentAmounts[player][STUDENT_MMONEY] = 0;
+         player++;
+     }
+   }
 }
 
 
