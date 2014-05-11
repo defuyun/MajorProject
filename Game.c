@@ -1020,7 +1020,7 @@ int isLegalAction (Game g, action a) {
         isLegal = FALSE;
     }
 
-    // it is not legal to use a path that leaves the board
+    // it is illegal to use a path that leaves the board
     if (a.actionCode == OBTAIN_ARC || a.actionCode == BUILD_GO8
             || a.actionCode == BUILD_CAMPUS) {
         if (isPathContained(a.destination) == FALSE) {
@@ -1040,7 +1040,7 @@ int isLegalAction (Game g, action a) {
         int resourceC = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
         int resourceD = getStudents(g, getWhoseTurn(g), STUDENT_MTV);
         
-        //check for enough resources
+        //check for enough students
         if (resourceA<1 || resourceB<1 || resourceC<1 || resourceD<1) {
             isLegal = FALSE;
         }
@@ -1051,12 +1051,10 @@ int isLegalAction (Game g, action a) {
         }
 
         // check the campus is connected to one of the player's ARCs
-        /*
         if (isCampusConnected(a.destination, getWhoseTurn(g)) 
                 == FALSE) {
             isLegal = FALSE;
         }
-        */
 
         // is the vertex we are building at adjacent to another campus
         if (isCampusTooClose(g, a.destination) == TRUE) {
@@ -1069,7 +1067,7 @@ int isLegalAction (Game g, action a) {
         int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
         int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_MMONEY);
 
-        // check for enough resources 
+        // check for enough students 
         if (resourceA<2 || resourceB<3) {
             isLegal = FALSE;
         }
@@ -1080,11 +1078,12 @@ int isLegalAction (Game g, action a) {
         }
     }
 
+    // check that conditions are satisfied for building an ARC
     if (a.actionCode == OBTAIN_ARC) {
         int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_BPS);
         int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_BQN);
 
-        // check for enough resources
+        // check for enough students
         if (resourceA<1 || resourceB<1) {
             isLegal = FALSE;
         }
@@ -1095,23 +1094,24 @@ int isLegalAction (Game g, action a) {
         }
 
         // check the player has connected arcs/campuses
-        /*
         if (isARCConnected(a.destination, getWhoseTurn(g)) == FALSE) {
             isLegal = FALSE;
         }
-        */
     }
     
+    
+    // check there are enough students to start a spinoff
     if (a.actionCode == START_SPINOFF) {
         int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
         int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_MTV);
         int resourceC = getStudents(g, getWhoseTurn(g), STUDENT_MMONEY);
-        //check if player has enough resource to start spinoff
         if (resourceA < 1 || resourceB < 1 || resouceC < 1) {
             isLegal = FALSE;
         }
     }
     
+
+    // check there are enough students to retrain
     if (a.actionCode == RETRAIN_STUDENTS) {
         int resourceA = getStudents(g, getWhoseTurn(g), a.disciplineFrom);
         int resourceB = getStudents(g, getWhoseTurn(g), a.disciplineTo);
