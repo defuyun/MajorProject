@@ -49,7 +49,7 @@ int main (int argc, char *argv[]){
     int hasWinner = FALSE;
     int winner = NO_ONE;
     while (hasWinner == FALSE) {
-        throwDice(g, rand()%12 + 2);
+        throwDice(g, rand()%10 + 2);
         printf("Player %d's turn\n", getWhoseTurn(g));
         printResources(g, getWhoseTurn(g));
 
