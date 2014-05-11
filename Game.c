@@ -871,7 +871,7 @@ void throwDice (Game g, int diceScore) {
    if (diceScore == 7) {
       int player = 0;
       while (player < NUM_UNIS) {
-         g->studentAmounts[player][STUDENT_THD] = 
+         g->studentAmounts[player][STUDENT_THD] += 
             g->studentAmounts[player][STUDENT_MTV]
                + g->studentAmounts[player][STUDENT_MMONEY];
          g->studentAmounts[player][STUDENT_MTV] = 0;
