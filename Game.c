@@ -374,7 +374,7 @@ static int isPathContained(path inPath) {
     // UP-RIGHT: 4      RIGHT: 5
 
     // suppose we are outside the board, about to step onto the board
-    coord currentCoord = {.x = 2, .y = 6};
+    coord currentCoord = {.x = 2, .y = 6, .vertNum = -1};
     int currentDirection = 0;
     int isContained = TRUE;
 
@@ -399,23 +399,31 @@ static int isPathContained(path inPath) {
         if (newDirection == 1 && currentDirection == 0) {
             currentCoord.x++;
             currentCoord.y--;
+            currentCoord.arcNum = 0;
         } else if (newDirection == 2 && currentDirection == 1) {
             currentCoord.x--;
+            currentCoord.arcNum = 1;
         } else if (newDirection == 3 && currentDirection == 2) {
             currentCoord.x--;
             currentCoord.y++;
+            currentCoord.arcNum = 2;
         } else if (newDirection == 4 && currentDirection == 3) {
             currentCoord.x++;
+            currentCoord.arcNum = 0;
         } else if (newDirection == 5 && currentDirection == 0) {
             currentCoord.x++;
             currentCoord.y--;
+            currentCoord.arcNum = 1;
         } else if (newDirection == 4 && currentDirection == 5) {
             currentCoord.x++;
+            currentCoord.arcNum = 0;
         } else if (newDirection == 3 && currentDirection == 4) {
             currentCoord.x--;
             currentCoord.y++;
+            currentCoord.arcNum = 2;
         } else if (newDirection == 0 && currentDirection == 1) {
             currentCoord.x--;
+            currentCoord.arcNum = 2;
         } 
 
         // check to see if our coordinate ends up outside the board
@@ -542,7 +550,7 @@ static int isCoordInside(coord c) {
 
 
 static int isARCConnected(path inPath, Game g, int player){
-   int connected = 0;
+   int connected = FALSE;
    path pL,pR,pBL,pBR,v0,v1;
    strcpy(pL, inPath);
    strcat(pL, "L");
@@ -559,14 +567,14 @@ static int isARCConnected(path inPath, Game g, int player){
    if (getARC(g,pL) == player || getARC(g,pR) == player
        || getARC(g,pBL) == player || getARC(g,pBR) == player
        || getCampus(g,v0) == player || getCampus(g,v1) == player) {
-      connected = 1;
+      connected = TRUE;
    }
    return connected;
 }
 
 
 static int isCampusConnected(path inPath, Game g, int player){
-   int connected = 0;
+   int connected = FALSE;
    path pL;
    path pR;
    strcpy(pL, inPath);
@@ -576,7 +584,7 @@ static int isCampusConnected(path inPath, Game g, int player){
 
    if (getARC(g,pL) == player || getARC(g,pR) == player
        || getARC(g,inPath) == player) {
-      connected = 1;
+      connected = TRUE;
    }
    return connected;
 }

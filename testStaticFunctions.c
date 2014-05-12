@@ -70,6 +70,17 @@ int main (int argc, char *argv[]) {
     c.arcNum = -1;
     c.vertNum = 0;
     assert(isCoordInside(c) == TRUE);
+    coord leftEdge = {.x = 0, .y = 4, .arcNum = 2, .vertNum = -1};
+    assert(isCoordInside(leftEdge) == TRUE);
+    leftEdge.arcNum = 1;
+    assert(isCoordInside(leftEdge) == FALSE);
+    leftEdge.vertNum = 1;
+    leftEdge.arcNum = -1;
+    assert(isCoordInside(leftEdge) == TRUE);
+    leftEdge.vertNum = 0;
+    assert(isCoordInside(leftEdge) == FALSE);
+
+    assert(isPathContained("RLRRLRR") == TRUE);
 
     // check that pathToVertex works properly
     puts("testing pathToVertex()......");
