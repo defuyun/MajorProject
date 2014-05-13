@@ -973,7 +973,6 @@ int isLegalAction (Game g, action a) {
             || a.actionCode == BUILD_CAMPUS) {
         if (isPathContained(a.destination) == FALSE) {
             isLegal = FALSE;
-            printf("Illegal to build using path that leaves board\n");
         }
     }
 
