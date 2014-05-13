@@ -79,8 +79,14 @@ int main (int argc, char *argv[]) {
     assert(isCoordInside(leftEdge) == TRUE);
     leftEdge.vertNum = 0;
     assert(isCoordInside(leftEdge) == FALSE);
+    leftEdge.x = 6;
+    leftEdge.y = 0;
+    leftEdge.arcNum = 1;
+    leftEdge.vertNum = -1;
+    assert(isCoordInside(leftEdge) == FALSE);
 
     assert(isPathContained("RLRRLRR") == TRUE);
+    assert(isPathContained("LRLRLRRLRLL") == FALSE);
 
     // check that pathToVertex works properly
     puts("testing pathToVertex()......");

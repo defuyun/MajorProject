@@ -712,6 +712,15 @@ void testIsLegalAction(void) {
     assert(isLegalAction(g, v) == FALSE);
     action w = {.actionCode = OBTAIN_ARC, .destination="RRRLLLR"};
     assert(isLegalAction(g, w) == FALSE);
+    throwDice(g, 2);
+    action buildARCOffBoard = {.actionCode = OBTAIN_ARC, .destination=
+        "LRLRLRRLRLL"};
+    isLegalAction(g, buildARCOffBoard);
+    action buildARCOffBoard2 = {.actionCode = OBTAIN_ARC, .destination=
+        "LRLRLRRLRL"};
+    (isLegalAction(g, buildARCOffBoard2));
+    throwDice(g, 2);
+    throwDice(g, 2);
     
     // TEST 5: can't build ARCs/campuses on top of each other
     genResources(g, 5, 2);

@@ -374,7 +374,7 @@ static int isPathContained(path inPath) {
     // UP-RIGHT: 4      RIGHT: 5
 
     // suppose we are outside the board, about to step onto the board
-    coord currentCoord = {.x = 2, .y = 6, .vertNum = -1};
+    coord currentCoord = {.x = 2, .y = 6, .arcNum = 2, .vertNum = -1};
     int currentDirection = 0;
     int isContained = TRUE;
 
@@ -517,14 +517,8 @@ static int isCoordInside(coord c) {
             isInside = TRUE;
         }
 
-        // if we are on the right edge of the board, hex is outside
-        if (c.x == 6 && c.y > -1 && c.y < 3 
-                && (c.arcNum == 0 || c.vertNum == 0)) {
-            isInside = TRUE;
-        }
-
         // if we are on the bottom right edge of the board, hex is outside
-        if (c.y == 0 && c.x > 2 && c.y < 6) {
+        if (c.y == 0 && c.x > 2 && c.x < 6) {
             if (c.x == 3) {
                 if (c.arcNum == 1 || c.vertNum == 0 || c.vertNum == 1) {
                     isInside = TRUE;
@@ -979,6 +973,7 @@ int isLegalAction (Game g, action a) {
             || a.actionCode == BUILD_CAMPUS) {
         if (isPathContained(a.destination) == FALSE) {
             isLegal = FALSE;
+            printf("Illegal to build using path that leaves board\n");
         }
     }
 
