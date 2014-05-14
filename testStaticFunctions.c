@@ -85,7 +85,9 @@ int main (int argc, char *argv[]) {
     leftEdge.vertNum = -1;
     assert(isCoordInside(leftEdge) == FALSE);
 
+    puts("Testing isPathContained()");
     assert(isPathContained("RLRRLRR") == TRUE);
+    assert(isPathContained("R") == TRUE);
     assert(isPathContained("LRLRLRRLRLL") == FALSE);
 
     // check that pathToVertex works properly
@@ -153,14 +155,6 @@ int main (int argc, char *argv[]) {
     assert(test.y == 0);
     assert(test.arcNum == -1);
     assert(test.vertNum == 0);
-
-    puts("test 10....");
-    //this one goes outside the board and back
-    test = pathToVertex("RLRRLRRLLLL");
-    assert(test.x == 0);
-    assert(test.y == 4);
-    assert(test.arcNum == -1);
-    assert(test.vertNum == 1);
 
     // check that pathToARC works properly
     puts("testing PathToArc()....");

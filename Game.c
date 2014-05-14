@@ -173,6 +173,9 @@ static int isCoordInside(coord c);
 
 // Return the coordinate of a hex given its region ID
 static coord regIDToCoord(int regID) {
+    assert(regID >= 0 && "INVALID REGION ID");
+    assert(regID < NUM_REGIONS && "INVALID REGION ID");
+
     coord newCoord;
     if (regID < 3) {
         newCoord.x = 1;
@@ -198,10 +201,10 @@ static coord regIDToCoord(int regID) {
 // return the region ID of a hex given it's coordinate, or -1 if 
 // outside the board
 static int coordToRegID(coord inCoord) {
+    assert(isCoordInside(inCoord) == TRUE && "INVALID COORDINATE");
+
     int newRegID;
-    if (isCoordInside(inCoord) == FALSE) {
-        newRegID = -1;
-    } else if (inCoord.x < 2) {
+    if (inCoord.x < 2) {
         newRegID = 5 - inCoord.y;
     } else if (inCoord.x < 3) {
         newRegID = 8 - inCoord.y;
@@ -218,6 +221,9 @@ static int coordToRegID(coord inCoord) {
 
 // return the coordinate of a path at the end of the vertex
 static coord pathToVertex(path inPath) {
+    assert(isPathContained(inPath) == TRUE 
+            && "INVALID PATH");
+
     // there are six directions we could be facing, call them 0..5
     // turning RIGHT adds 1 to the direction, mod 6
     // turning LEFT subtracts 1 off the direction, mod 6
@@ -297,6 +303,9 @@ static coord pathToVertex(path inPath) {
 
 // return the coordinate of the arc at the end of a path
 static coord pathToARC(path inPath) {
+    assert(isPathContained(inPath) == TRUE 
+            && "INVALID PATH");
+
     // there are six directions we could be facing, call them 0..5
     // turning RIGHT adds 1 to the direction, mod 6
     // turning LEFT subtracts 1 off the direction, mod 6
@@ -383,7 +392,8 @@ static int isPathContained(path inPath) {
     while (inPath[i] != 0 && isContained == TRUE) {
         // read the direction to turn, assert it is a valid direction
         char turn = inPath[i];
-        assert(turn == 'R' || turn == 'L' || turn == 'B');
+        assert((turn == 'R' || turn == 'L' || turn == 'B')
+                && "INVALID PATH");
 
         // newDirection is the direction [0..5] we face after the turn
         int newDirection;
@@ -443,6 +453,8 @@ static int isPathContained(path inPath) {
 // Returns true if there are campuses adjacent to the vertex located at
 // path "inPath"
 static int isCampusTooClose(Game g, path inPath) {
+    assert(isPathContained(inPath) == TRUE && "INVALID PATH");
+
     int isTooClose = FALSE;
     coord c = pathToVertex(inPath);
     if (c.vertNum == 0) {
@@ -543,8 +555,13 @@ static int isCoordInside(coord c) {
 }
 
 
-static int isARCConnected(path inPath, Game g, int player){
+static int isARCConnected(path inPath, Game g, int player) {
+   assert(isPathContained(inPath) == TRUE && "INVALID PATH");
+   assert((player == UNI_A || player == UNI_B || player == UNI_C)
+           && "INVALID PLAYER");
+
    int connected = FALSE;
+
    path pL,pR,pBL,pBR,v0,v1;
    strcpy(pL, inPath);
    strcat(pL, "L");
@@ -558,17 +575,26 @@ static int isARCConnected(path inPath, Game g, int player){
    strcat(v1, "B");
    strcpy(v0, inPath);
 
-   if (getARC(g,pL) == player || getARC(g,pR) == player
-       || getARC(g,pBL) == player || getARC(g,pBR) == player
-       || getCampus(g,v0) == player || getCampus(g,v1) == player) {
+   if ((isPathContained(pL) && getARC(g,pL) == player)
+           || (isPathContained(pR) && getARC(g,pR) == player)
+           || (isPathContained(pBL) && getARC(g,pBL) == player)
+           || (isPathContained(pBR) && getARC(g,pBR) == player)
+           || (isPathContained(v0) && getCampus(g,v0) == player)
+           || (isPathContained(v1) && getCampus(g,v1) == player)) {
       connected = TRUE;
    }
+
    return connected;
 }
 
 
 static int isCampusConnected(path inPath, Game g, int player){
+   assert(isPathContained(inPath) == TRUE && "INVALID PATH");
+   assert((player == UNI_A || player == UNI_B || player == UNI_C)
+           && "INVALID PLAYER");
+
    int connected = FALSE;
+
    path pL;
    path pR;
    strcpy(pL, inPath);
@@ -576,18 +602,14 @@ static int isCampusConnected(path inPath, Game g, int player){
    strcpy(pR, inPath);
    strcat(pR, "R");
 
-   if (getARC(g,pL) == player || getARC(g,pR) == player
-       || getARC(g,inPath) == player) {
+   if ((isPathContained(pL) && getARC(g,pL) == player)
+           || (isPathContained(pR) && getARC(g,pR) == player)
+           || (isPathContained(inPath) && getARC(g,inPath) == player)) {
       connected = TRUE;
    }
+
    return connected;
 }
-
-
-
-
-
-
 
 
 // =====================================================================
@@ -807,6 +829,8 @@ void makeAction (Game g, action a) {
 // the game starts in turn -1 (we call this state "Terra Nullis") and 
 // moves to turn 0 as soon as the first dice is thrown. 
 void throwDice (Game g, int diceScore) {
+   assert(diceScore >= 2 && diceScore <= 12 && "INVALID DICE NUM");
+
    g->turnNumber++;
    int X = 0;
    int Y = 0;
@@ -888,6 +912,8 @@ void throwDice (Game g, int diceScore) {
 // regionID is the index of the region in the newGame arrays (above) 
 // see discipline codes above
 int getDiscipline (Game g, int regionID) {
+    assert(regionID >= 0 && regionID < NUM_REGIONS 
+            && "INVALID REGION ID");
     coord c = regIDToCoord(regionID);
     return g->grid[c.x][c.y].resType;
 }
@@ -896,6 +922,8 @@ int getDiscipline (Game g, int regionID) {
 // what dice value produces students in the specified region?
 // 2..12
 int getDiceValue (Game g, int regionID) {
+    assert(regionID >= 0 && regionID < NUM_REGIONS 
+            && "INVALID REGION ID");
     coord c = regIDToCoord(regionID);
     return g->grid[c.x][c.y].diceNum;
 }
@@ -938,14 +966,18 @@ int getWhoseTurn (Game g) {
 // return the contents of the given vertex (ie campus code or 
 // VACANT_VERTEX)
 int getCampus(Game g, path inPath) {
-     //get the 2d coord of the path
-     coord vertex = pathToVertex(inPath);
-     return g->grid[vertex.x][vertex.y].vertices[vertex.vertNum];
+    assert(isPathContained(inPath) == TRUE && "INVALID PATH");
+
+    //get the 2d coord of the path
+    coord vertex = pathToVertex(inPath);
+    return g->grid[vertex.x][vertex.y].vertices[vertex.vertNum];
 }
 
 
 // return the contents of the given edge (ie ARC code or vacant ARC)
 int getARC(Game g, path pathToEdge) {
+    assert(isPathContained(pathToEdge) == TRUE && "INVALID PATH");
+
     //get the 2d coord of the path
     coord arc = pathToARC(pathToEdge);
     return g->grid[arc.x][arc.y].arcs[arc.arcNum];
@@ -958,6 +990,8 @@ int getARC(Game g, path pathToEdge) {
 // or OBTAIN_IP_PATENT (they can make the move START_SPINOFF)
 // you can assume that any paths passed in are NULL terminated strings.
 int isLegalAction (Game g, action a) {
+    assert(a.actionCode >= 0 && a.actionCode <= 7 && "INVALID ACTION");
+
     // assume the action is legal, then go through a series of tests,
     // changing it to FALSE if it fails a test.
     int isLegal = TRUE;
@@ -968,50 +1002,46 @@ int isLegalAction (Game g, action a) {
         isLegal = FALSE;
     }
 
-    // it is illegal to use a path that leaves the board
-    if (a.actionCode == OBTAIN_ARC || a.actionCode == BUILD_GO8
-            || a.actionCode == BUILD_CAMPUS) {
-        if (isPathContained(a.destination) == FALSE) {
-            isLegal = FALSE;
-        }
-    }
-
     // it is illegal to make any action during terra nullis
     if (getTurnNumber(g) == -1) {
         isLegal = FALSE;
     }
     
     // check that conditions are satisfied for building a campus
-    if (a.actionCode == BUILD_CAMPUS) {
+    if (a.actionCode == BUILD_CAMPUS && getTurnNumber(g) != -1) {
         int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_BPS);
         int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_BQN);
         int resourceC = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
         int resourceD = getStudents(g, getWhoseTurn(g), STUDENT_MTV);
-        
+
         //check for enough students
         if (resourceA<1 || resourceB<1 || resourceC<1 || resourceD<1) {
             isLegal = FALSE;
         }
 
-        //check if the vertex is vacant and there is an arc
-        if (getCampus(g,a.destination) != VACANT_VERTEX) {
+        if (isPathContained(a.destination) == FALSE) {
             isLegal = FALSE;
-        }
+        } else {
+            //check if the vertex is vacant and there is an arc
+            if (getCampus(g,a.destination) != VACANT_VERTEX) {
+                isLegal = FALSE;
+            }
 
-        // check the campus is connected to one of the player's ARCs
-        if (isCampusConnected(a.destination, g, getWhoseTurn(g)) 
-                == FALSE) {
-            isLegal = FALSE;
-        }
+            // check the campus is connected to one of the player's ARCs
+            if (isCampusConnected(a.destination, g, getWhoseTurn(g)) 
+                    == FALSE) {
+                isLegal = FALSE;
+            }
 
-        // is the vertex we are building at adjacent to another campus
-        if (isCampusTooClose(g, a.destination) == TRUE) {
-            isLegal = FALSE;
+            // is the vertex we are building at adjacent to another campus
+            if (isCampusTooClose(g, a.destination) == TRUE) {
+                isLegal = FALSE;
+            }
         }
     }
 
     // check that conditions are satisfied for building a GO8
-    if (a.actionCode == BUILD_GO8) {
+    if (a.actionCode == BUILD_GO8 && getTurnNumber(g) != -1) {
         int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
         int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_MMONEY);
 
@@ -1020,14 +1050,17 @@ int isLegalAction (Game g, action a) {
             isLegal = FALSE;
         }
 
-        // check player has a campus there already
-        if (getCampus(g, a.destination) != getWhoseTurn(g)) {
+        if (isPathContained(a.destination) == FALSE) {
             isLegal = FALSE;
+        } else {
+            if (getCampus(g, a.destination) != getWhoseTurn(g)) {
+                isLegal = FALSE;
+            }
         }
     }
 
     // check that conditions are satisfied for building an ARC
-    if (a.actionCode == OBTAIN_ARC) {
+    if (a.actionCode == OBTAIN_ARC && getTurnNumber(g) != -1) {
         int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_BPS);
         int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_BQN);
 
@@ -1036,20 +1069,22 @@ int isLegalAction (Game g, action a) {
             isLegal = FALSE;
         }
 
-        // check the building destination is empty
-        if (getARC(g,a.destination) != VACANT_ARC) {
+        if (isPathContained(a.destination) == FALSE) {
             isLegal = FALSE;
-        }
-
-        // check the player has connected arcs/campuses
-        if (isARCConnected(a.destination, g, getWhoseTurn(g)) == FALSE) {
-            isLegal = FALSE;
+        } else {
+            if (getARC(g,a.destination) != VACANT_ARC) {
+                isLegal = FALSE;
+            }
+            if (isARCConnected(a.destination, g, 
+                        getWhoseTurn(g)) == FALSE) {
+                isLegal = FALSE;
+            }
         }
     }
     
     
     // check there are enough students to start a spinoff
-    if (a.actionCode == START_SPINOFF) {
+    if (a.actionCode == START_SPINOFF && getTurnNumber(g) != -1) {
         int resourceA = getStudents(g, getWhoseTurn(g), STUDENT_MJ);
         int resourceB = getStudents(g, getWhoseTurn(g), STUDENT_MTV);
         int resourceC = getStudents(g, getWhoseTurn(g), STUDENT_MMONEY);
@@ -1060,7 +1095,7 @@ int isLegalAction (Game g, action a) {
     
 
     // check there are enough students to retrain
-    if (a.actionCode == RETRAIN_STUDENTS) {
+    if (a.actionCode == RETRAIN_STUDENTS && getTurnNumber(g) != -1) {
         int resourceA = getStudents(g, getWhoseTurn(g), a.disciplineFrom);
         int resourceB = getStudents(g, getWhoseTurn(g), a.disciplineTo);
         
@@ -1084,6 +1119,9 @@ int isLegalAction (Game g, action a) {
 
 // return the number of KPI points the specified player has
 int getKPIpoints (Game g, int player) {
+    assert((player == UNI_A || player == UNI_B || player == UNI_C)
+            && "INVALID PLAYER");
+
     // player-1 so that we can use the player number 1..3 as index 0..2
     return g->numKPI[player-1];
 }
@@ -1091,6 +1129,9 @@ int getKPIpoints (Game g, int player) {
 
 // return the number of ARC grants the specified player has
 int getARCs (Game g, int player) {
+    assert((player == UNI_A || player == UNI_B || player == UNI_C)
+            && "INVALID PLAYER");
+
     // player-1 so that we can use the player number 1..3 as index 0..2
     return g->numARCs[player-1];
 }
@@ -1098,6 +1139,9 @@ int getARCs (Game g, int player) {
 
 // return the number of GO8 campuses the specified player has
 int getGO8s (Game g, int player) {
+    assert((player == UNI_A || player == UNI_B || player == UNI_C)
+            && "INVALID PLAYER");
+
     // player-1 so that we can use the player number 1..3 as index 0..2
     return g->numGO8s[player-1];
 }
@@ -1105,6 +1149,9 @@ int getGO8s (Game g, int player) {
 
 // return the number of normal Campuses the specified player has
 int getCampuses (Game g, int player) {
+    assert((player == UNI_A || player == UNI_B || player == UNI_C)
+            && "INVALID PLAYER");
+
     // player-1 so that we can use the player number 1..3 as index 0..2
     return g->numCampuses[player-1];
 }
@@ -1112,6 +1159,9 @@ int getCampuses (Game g, int player) {
 
 // return the number of IP Patents the specified player has
 int getIPs (Game g, int player) {
+    assert((player == UNI_A || player == UNI_B || player == UNI_C)
+            && "INVALID PLAYER");
+
     // player-1 so that we can use the player number 1..3 as index 0..2
     return g->numIPs[player-1];
 }
@@ -1119,6 +1169,9 @@ int getIPs (Game g, int player) {
 
 // return the number of Publications the specified player has
 int getPublications (Game g, int player) {
+    assert((player == UNI_A || player == UNI_B || player == UNI_C)
+            && "INVALID PLAYER");
+
     // player-1 so that we can use the player number 1..3 as index 0..2
     return g->numPubs[player-1];
 }
@@ -1127,6 +1180,15 @@ int getPublications (Game g, int player) {
 // return the number of students of the specified discipline type 
 // the specified player has
 int getStudents (Game g, int player, int discipline) {
+    assert((player == UNI_A || player == UNI_B || player == UNI_C)
+            && "INVALID PLAYER");
+    assert(((discipline == STUDENT_THD) ||
+           (discipline == STUDENT_BPS)  ||
+           (discipline == STUDENT_BQN)  ||
+           (discipline == STUDENT_MJ )  ||
+           (discipline == STUDENT_MTV)  ||
+           (discipline == STUDENT_MMONEY)) && "INVALID STUDENT");
+
     // player-1 so that we can use the player number 1..3 as index 0..2
     // use the discipline 0..5 as the index
     return g->studentAmounts[player-1][discipline];
@@ -1139,19 +1201,21 @@ int getStudents (Game g, int player, int discipline) {
 // on what retraining centers, if any, they have a campus at.
 int getExchangeRate (Game g, int player, 
                      int disciplineFrom, int disciplineTo) {
+    assert((player == UNI_A || player == UNI_B || player == UNI_C)
+            && "INVALID PLAYER");
 
     // checks that the discipline that
     // wants to be retrained is not a THD
-    assert(disciplineFrom != STUDENT_THD);
+    assert(disciplineFrom != STUDENT_THD && "CAN'T RETRAIN THD");
 
     // checks that the discipline that
     // wants to be trained into is valid
-    assert((disciplineTo == STUDENT_THD)  ||
+    assert(((disciplineTo == STUDENT_THD) ||
            (disciplineTo == STUDENT_BPS)  ||
            (disciplineTo == STUDENT_BQN)  ||
            (disciplineTo == STUDENT_MJ )  ||
            (disciplineTo == STUDENT_MTV)  ||
-           (disciplineTo == STUDENT_MMONEY));
+           (disciplineTo == STUDENT_MMONEY)) && "INVALID STUDENT");
 
     int playerCampus;
     int playerGroupOfEight;
