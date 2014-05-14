@@ -1188,7 +1188,7 @@ void testGetARCs(void) {
     //TEST 1: Testing that each player has no ARCs
     assert(getARCs(g, UNI_A) == NO_ONE);
     assert(getARCs(g, UNI_B) == NO_ONE);
-    assert(getARCs(g, UNI_C == NO_ONE));
+    assert(getARCs(g, UNI_C) == NO_ONE);
     //assert(getARCs(g, NO_ONE) == NO_ONE); //maybe set NO_ONE to a random value
     
     runGame(g);
@@ -1197,9 +1197,9 @@ void testGetARCs(void) {
     buildARC(g, "LR");
 
     //TEST 2; Test new arcs for UNI_A
-    assert(getARCs(g,UNI_A) == 2);
+    assert(getARCs(g, UNI_A) == 2);
     assert(getARCs(g, UNI_B) == NO_ONE);
-    assert(getARCs(g, UNI_C == NO_ONE));
+    assert(getARCs(g, UNI_C) == NO_ONE);
 
     endTurn(g); //UNI_B's turn
 
@@ -1207,7 +1207,7 @@ void testGetARCs(void) {
     //TEST 3: Test new ARC for UNI_B
     assert(getARCs(g, UNI_A) == 2);
     assert(getARCs(g, UNI_B) == 1);
-    assert(getARCs(g, UNI_C == 0));
+    assert(getARCs(g, UNI_C) == 0);
 
     endTurn(g);//UNI_C's turn
 
@@ -1215,13 +1215,13 @@ void testGetARCs(void) {
     //TEST 4: Test new ARC for UNI_C
     assert(getARCs(g, UNI_A) == 2);
     assert(getARCs(g, UNI_B) == 1);
-    assert(getARCs(g, UNI_C == 1));
+    assert(getARCs(g, UNI_C) == 1);
 
     buildARC(g, "RRLRLLRLRLLR");
     //TEST 5: Test new ARC for UNI_C
     assert(getARCs(g, UNI_A) == 2);
     assert(getARCs(g, UNI_B) == 1);
-    assert(getARCs(g, UNI_C == 2));
+    assert(getARCs(g, UNI_C) == 2);
     disposeGame(g);
 }
 
