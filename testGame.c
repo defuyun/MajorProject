@@ -1475,11 +1475,8 @@ void runGame(Game g){
     int retrainStu;
     int toStud;
     assert(getWhoseTurn(g) == UNI_A);
-    action a = { .actionCode = 0 };
 
     while (turns++ < 360){
-        assert(isLegalAction(g, a) == TRUE);
-        makeAction(g, a);
         throwDice(g, 11); //uni++
     }//UNI_A gets 360 STUDENT_MTVNS total  361 STUDENT_MTVN
     assert(getWhoseTurn(g) == UNI_A);
@@ -1502,8 +1499,6 @@ void runGame(Game g){
 
     turns = 0;
     while (turns++ < 360){
-        assert(isLegalAction(g, a) == TRUE);
-        makeAction(g, a);
         throwDice(g, 5);
     }//UNI_B gets 360 STUDENT_BPS total 363 STUDENT_BPS
     throwDice(g, 5);
@@ -1525,8 +1520,6 @@ void runGame(Game g){
 
     turns = 0;
     while (turns++ < 360){
-        assert(isLegalAction(g, a) == TRUE);
-        makeAction(g, a);
         throwDice(g, 8);
     }//UNI_C gets 360 STUDENT_MTVNS,360 STUDENT_MJOW
 

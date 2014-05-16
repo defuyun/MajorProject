@@ -990,7 +990,6 @@ int getARC(Game g, path pathToEdge) {
 // or OBTAIN_IP_PATENT (they can make the move START_SPINOFF)
 // you can assume that any paths passed in are NULL terminated strings.
 int isLegalAction (Game g, action a) {
-
     // assume the action is legal, then go through a series of tests,
     // changing it to FALSE if it fails a test.
     int isLegal = TRUE;
@@ -1001,11 +1000,26 @@ int isLegalAction (Game g, action a) {
         isLegal = FALSE;
     }
 
-    if (a.actionCode <= 0 || a.actionCode >= 7){
+    // check the action code is legal
+    if (a.actionCode < 0 || a.actionCode > 7){
         isLegal= FALSE;
     }
 
 
+    // run a check on each character in the path to ensure it is valid
+    int i = 0;
+    int isValidPath = TRUE;
+    if (a.actionCode == OBTAIN_ARC || a.actionCode == BUILD_CAMPUS
+            || a.actionCode == BUILD_GO8) {
+        while (i < strlen(a.destination)) {
+            if (a.destination[i] != 'R' && a.destination[i] != 'L'
+                    && a.destination[i] != 'B') {
+                isValidPath = FALSE;
+                isLegal = FALSE;
+            }
+            i++;
+        }
+    }
 
     // it is illegal to make any action during terra nullis
     if (getTurnNumber(g) == -1) {
@@ -1024,23 +1038,25 @@ int isLegalAction (Game g, action a) {
             isLegal = FALSE;
         }
 
-        if (isPathContained(a.destination) == FALSE) {
-            isLegal = FALSE;
-        } else {
-            //check if the vertex is vacant and there is an arc
-            if (getCampus(g,a.destination) != VACANT_VERTEX) {
+        if (isValidPath) {
+            if (isPathContained(a.destination) == FALSE) {
                 isLegal = FALSE;
-            }
+            } else {
+                //check if the vertex is vacant and there is an arc
+                if (getCampus(g,a.destination) != VACANT_VERTEX) {
+                    isLegal = FALSE;
+                }
 
-            // check the campus is connected to one of the player's ARCs
-            if (isCampusConnected(a.destination, g, getWhoseTurn(g)) 
-                    == FALSE) {
-                isLegal = FALSE;
-            }
+                // check the campus is connected to player's ARCs
+                if (isCampusConnected(a.destination, g, getWhoseTurn(g)) 
+                        == FALSE) {
+                    isLegal = FALSE;
+                }
 
-            // is the vertex we are building at adjacent to another campus
-            if (isCampusTooClose(g, a.destination) == TRUE) {
-                isLegal = FALSE;
+                // check there is separation between campuses
+                if (isCampusTooClose(g, a.destination) == TRUE) {
+                    isLegal = FALSE;
+                }
             }
         }
     }
@@ -1055,11 +1071,13 @@ int isLegalAction (Game g, action a) {
             isLegal = FALSE;
         }
 
-        if (isPathContained(a.destination) == FALSE) {
-            isLegal = FALSE;
-        } else {
-            if (getCampus(g, a.destination) != getWhoseTurn(g)) {
+        if (isValidPath) {
+            if (isPathContained(a.destination) == FALSE) {
                 isLegal = FALSE;
+            } else {
+                if (getCampus(g, a.destination) != getWhoseTurn(g)) {
+                    isLegal = FALSE;
+                }
             }
         }
     }
@@ -1078,22 +1096,7 @@ int isLegalAction (Game g, action a) {
             isLegal = FALSE;
         }
 
-
-
-
-        // There should be no asserts within isLegalAction, so I'm insulating isPathContained
-        // from invalid destination strings.
-        int iterate = 0;
-        char buffer = 0;
-        while (iterate < strlen(a.destination)) {
-           buffer = a.destination[buffer];
-           if (buffer != 'L' && buffer != 'R' && buffer != 'B') {
-               isLegal = FALSE;
-           }
-        }
-
-
-        if (isLegal != FALSE) {
+        if (isValidPath) {
             if (isPathContained(a.destination) == FALSE) {
                 isLegal = FALSE;
             } else {
