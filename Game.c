@@ -1080,15 +1080,30 @@ int isLegalAction (Game g, action a) {
 
 
 
-        if (isPathContained(a.destination) == FALSE) {
-            isLegal = FALSE;
-        } else {
-            if (getARC(g,a.destination) != VACANT_ARC) {
+
+        // There should be no asserts within isLegalAction, so I'm insulating isPathContained
+        // from invalid destination strings.
+        int iterate = 0;
+        char buffer = 0;
+        while (iterate < strlen(a.destination)) {
+           buffer = a.destination[buffer];
+           if (buffer != 'L' && buffer != 'R' && buffer != 'B') {
+               isLegal = FALSE;
+           }
+        }
+
+
+        if (isLegal != FALSE) {
+            if (isPathContained(a.destination) == FALSE) {
                 isLegal = FALSE;
-            }
-            if (isARCConnected(a.destination, g, 
-                        getWhoseTurn(g)) == FALSE) {
-                isLegal = FALSE;
+            } else {
+                if (getARC(g,a.destination) != VACANT_ARC) {
+                    isLegal = FALSE;
+                }
+                if (isARCConnected(a.destination, g, 
+                            getWhoseTurn(g)) == FALSE) {
+                    isLegal = FALSE;
+                }
             }
         }
     }
