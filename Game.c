@@ -990,7 +990,6 @@ int getARC(Game g, path pathToEdge) {
 // or OBTAIN_IP_PATENT (they can make the move START_SPINOFF)
 // you can assume that any paths passed in are NULL terminated strings.
 int isLegalAction (Game g, action a) {
-    assert(a.actionCode >= 0 && a.actionCode <= 7 && "INVALID ACTION");
 
     // assume the action is legal, then go through a series of tests,
     // changing it to FALSE if it fails a test.
@@ -1001,6 +1000,12 @@ int isLegalAction (Game g, action a) {
             || a.actionCode == OBTAIN_IP_PATENT) {
         isLegal = FALSE;
     }
+
+    if (a.actionCode <= 0 || a.actionCode >= 7){
+        isLegal= FALSE;
+    }
+
+
 
     // it is illegal to make any action during terra nullis
     if (getTurnNumber(g) == -1) {
@@ -1068,6 +1073,12 @@ int isLegalAction (Game g, action a) {
         if (resourceA<1 || resourceB<1) {
             isLegal = FALSE;
         }
+
+        if (strlen(a.destination) == 0) {
+            isLegal = FALSE;
+        }
+
+
 
         if (isPathContained(a.destination) == FALSE) {
             isLegal = FALSE;
