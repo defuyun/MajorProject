@@ -882,8 +882,8 @@ void testGetPublications(void) {
 void testNewGame(void) {
     puts("Testing function newGame()...");
 
-    int disciplines[NUM_REGIONS] = {0};
-    int dice[NUM_REGIONS] = {0};
+    int disciplines[NUM_REGIONS] = DEFAULT_DISCIPLINES;
+    int dice[NUM_REGIONS] = DEFAULT_DICE;
 
     Game g = newGame(disciplines, dice);
 
