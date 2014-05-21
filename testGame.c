@@ -938,7 +938,7 @@ void testGetDiscipline(void) {
     puts("Testing function getDiscipline()...");
 
     int disciplines[NUM_REGIONS];
-    int dice[NUM_REGIONS] = {0};
+    int dice[NUM_REGIONS] = DEFAULT_DICE;
 
     int i = 0;
     while (i < NUM_REGIONS) {

@@ -665,6 +665,8 @@ Game newGame (int discipline[], int dice[]) {
                 g->grid[column][row].arcs[2] = VACANT_ARC;
                 g->grid[column][row].vertices[0] = VACANT_VERTEX;
                 g->grid[column][row].vertices[1] = VACANT_VERTEX;
+                g->grid[column][row].retrainCenters[0] = -1;
+                g->grid[column][row].retrainCenters[1] = -1;
             } else {
                 g->grid[column][row].resType = -1;
                 g->grid[column][row].diceNum = -1;
@@ -673,6 +675,8 @@ Game newGame (int discipline[], int dice[]) {
                 g->grid[column][row].arcs[0] = VACANT_ARC;
                 g->grid[column][row].arcs[1] = VACANT_ARC;
                 g->grid[column][row].arcs[2] = VACANT_ARC;
+                g->grid[column][row].retrainCenters[0] = -1;
+                g->grid[column][row].retrainCenters[1] = -1;
             }
             column++;
         }
